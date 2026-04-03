@@ -1,0 +1,97 @@
+'use client';
+
+import React, { useMemo } from 'react';
+import Link from 'next/link';
+import { Pencil, Trash2 } from 'lucide-react';
+
+import ConfirmModal from '@/shared/components/modals/ConfirmModal';
+import { Category } from '@/entities/category/types/category.types';
+import { useAdminCategories } from '../hooks/useAdminCategories';
+import FullScreenSpinner from '@/shared/components/spinner/FullScreenSpinner';
+import { DataTable } from '@/shared/components/table/DataTable';
+
+import type { ColumnDef } from '@tanstack/react-table';
+import NoData from '@/shared/components/no-data/NoData';
+
+export function AdminCategories() {
+  const {
+    categories,
+    loading,
+    modal,
+    setModal,
+    handleAddCategory,
+    handleDeleteCategory,
+    deleteLoading,
+  } = useAdminCategories();
+
+  const columns = useMemo<ColumnDef<Category>[]>(
+    () => [
+      {
+        accessorKey: 'name',
+        header: 'Name',
+        cell: (info) => info.getValue(),
+      },
+      {
+        id: 'actions',
+        header: 'Actions',
+        cell: ({ row }) => {
+          const cat = row.original;
+          return (
+            <div className="flex items-center gap-3">
+              <Link
+                href={`/admin/categories/${cat.id}/edit`}
+                className="text-blue-600  hover:text-red-600"
+              >
+                <Pencil size={16} />
+              </Link>
+              <button
+                onClick={() => handleDeleteCategory(cat.id)}
+                className="text-sky-900 hover:text-red-600"
+                disabled={deleteLoading}
+                aria-label="Delete category"
+              >
+                <Trash2 size={16} />
+              </button>
+            </div>
+          );
+        },
+      },
+    ],
+    [handleDeleteCategory, deleteLoading]
+  );
+
+  if (loading) return <FullScreenSpinner />;
+
+  return (
+    <div className="p-6 space-y-10">
+      <ConfirmModal
+        isOpen={modal.show}
+        title="Delete Category"
+        message={modal.message}
+        onConfirm={modal.onConfirm}
+        onClose={() => setModal((prev) => ({ ...prev, show: false }))}
+        isLoading={deleteLoading}
+        confirmText="Delete"
+        cancelText="Cancel"
+      />
+
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-xl font-bold text-sky-900">Categories</h2>
+        {!!categories.length && (
+          <button
+            onClick={() => handleAddCategory()}
+            className="bg-sky-900 text-white px-4 py-2 rounded hover:bg-sky-800"
+          >
+            + Add New Category
+          </button>
+        )}
+      </div>
+
+      {!!categories.length ? (
+        <DataTable data={categories} columns={columns} />
+      ) : (
+        <NoData name="category" handleOnClick={handleAddCategory} />
+      )}
+    </div>
+  );
+}

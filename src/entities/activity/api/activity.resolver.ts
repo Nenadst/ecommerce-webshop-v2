@@ -148,9 +148,19 @@ const activityResolvers = {
         };
       }
     ) => {
+      // Validate userId exists before linking — avoids FK constraint errors from stale tokens
+      let resolvedUserId: string | null = null;
+      if (input.userId) {
+        const userExists = await prisma.user.findUnique({
+          where: { id: input.userId },
+          select: { id: true },
+        });
+        resolvedUserId = userExists ? input.userId : null;
+      }
+
       const log = await prisma.activityLog.create({
         data: {
-          userId: input.userId,
+          userId: resolvedUserId,
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           action: input.action as any,
           description: input.description,

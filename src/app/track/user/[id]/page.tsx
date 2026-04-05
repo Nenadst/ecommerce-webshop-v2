@@ -26,18 +26,25 @@ interface ActivityLog {
   createdAt: string;
 }
 
+const actionColors: Record<string, string> = {
+  LOGIN: 'bg-green-50 text-green-700 border-green-100',
+  LOGOUT: 'bg-slate-50 text-slate-600 border-slate-200',
+  VIEW_PRODUCT: 'bg-blue-50 text-blue-700 border-blue-100',
+  ADD_TO_CART: 'bg-amber-50 text-amber-700 border-amber-100',
+  CHECKOUT: 'bg-purple-50 text-purple-700 border-purple-100',
+  ORDER: 'bg-emerald-50 text-emerald-700 border-emerald-100',
+};
+
 export default function TrackUserPage() {
   const params = useParams();
   const router = useRouter();
   const userId = params.id as string;
   const { isAuthenticated, isAdmin } = useAuth();
 
-  // Initialize date range: default to last 7 days
   const getDefaultDates = () => {
     const today = new Date();
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(today.getDate() - 7);
-
     return {
       from: sevenDaysAgo.toISOString().split('T')[0],
       to: today.toISOString().split('T')[0],
@@ -65,17 +72,11 @@ export default function TrackUserPage() {
   });
 
   const handleDateChange = (type: 'from' | 'to', value: string) => {
-    setDateRange((prev) => ({
-      ...prev,
-      [type]: value,
-    }));
+    setDateRange((prev) => ({ ...prev, [type]: value }));
   };
 
   const handleClearFilter = () => {
-    setDateRange({
-      from: '',
-      to: '',
-    });
+    setDateRange({ from: '', to: '' });
   };
 
   const handleQuickFilter = (
@@ -89,30 +90,35 @@ export default function TrackUserPage() {
       case 'today':
         from = to;
         break;
-      case 'yesterday':
+      case 'yesterday': {
         const yesterday = new Date(today);
         yesterday.setDate(today.getDate() - 1);
         from = yesterday.toISOString().split('T')[0];
         setDateRange({ from, to: from });
         return;
-      case 'week':
+      }
+      case 'week': {
         const weekAgo = new Date(today);
         weekAgo.setDate(today.getDate() - 7);
         from = weekAgo.toISOString().split('T')[0];
         break;
-      case '30days':
+      }
+      case '30days': {
         const thirtyDaysAgo = new Date(today);
         thirtyDaysAgo.setDate(today.getDate() - 30);
         from = thirtyDaysAgo.toISOString().split('T')[0];
         break;
-      case 'month':
+      }
+      case 'month': {
         const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
         from = firstDayOfMonth.toISOString().split('T')[0];
         break;
-      case 'year':
+      }
+      case 'year': {
         const firstDayOfYear = new Date(today.getFullYear(), 0, 1);
         from = firstDayOfYear.toISOString().split('T')[0];
         break;
+      }
     }
 
     setDateRange({ from, to });
@@ -126,10 +132,6 @@ export default function TrackUserPage() {
     textContent += `User: ${logs[0]?.user?.name || 'Unknown'} (${logs[0]?.user?.email || 'N/A'})\n`;
     if (dateRange.from && dateRange.to) {
       textContent += `Date Range: ${new Date(dateRange.from).toLocaleDateString()} to ${new Date(dateRange.to).toLocaleDateString()}\n`;
-    } else if (dateRange.from) {
-      textContent += `Date Range: From ${new Date(dateRange.from).toLocaleDateString()}\n`;
-    } else if (dateRange.to) {
-      textContent += `Date Range: Until ${new Date(dateRange.to).toLocaleDateString()}\n`;
     } else {
       textContent += `Date Range: All time\n`;
     }
@@ -138,19 +140,15 @@ export default function TrackUserPage() {
     textContent += `\n${'='.repeat(100)}\n\n`;
 
     logs.forEach((log, index) => {
-      textContent += `[${index + 1}] Activity Log\n`;
-      textContent += `${'-'.repeat(100)}\n`;
+      textContent += `[${index + 1}] ${log.action}\n`;
+      textContent += `${'-'.repeat(80)}\n`;
       textContent += `ID: ${log.id}\n`;
       textContent += `User: ${log.userName || log.user?.name || 'Guest'}\n`;
-      textContent += `Action: ${log.action}\n`;
       textContent += `Description: ${log.description}\n`;
       textContent += `Date/Time: ${new Date(log.createdAt).toLocaleString()}\n`;
       if (log.path) textContent += `Path: ${log.path}\n`;
-      if (log.ipAddress) textContent += `IP Address: ${log.ipAddress}\n`;
-      if (log.userAgent) textContent += `User Agent: ${log.userAgent}\n`;
-      if (log.metadata) {
-        textContent += `Metadata: ${log.metadata}\n`;
-      }
+      if (log.ipAddress) textContent += `IP: ${log.ipAddress}\n`;
+      if (log.metadata) textContent += `Metadata: ${log.metadata}\n`;
       textContent += `\n`;
     });
 
@@ -165,12 +163,21 @@ export default function TrackUserPage() {
     URL.revokeObjectURL(url);
   };
 
+  const quickFilters = [
+    { key: 'today', label: 'Today' },
+    { key: 'yesterday', label: 'Yesterday' },
+    { key: 'week', label: 'Last 7 Days' },
+    { key: '30days', label: '30 Days' },
+    { key: 'month', label: 'This Month' },
+    { key: 'year', label: 'This Year' },
+  ] as const;
+
   if (!isAuthenticated || !isAdmin) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="bg-slate-50 min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-sky-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Checking permissions...</p>
+          <div className="w-8 h-8 rounded-full border-2 border-slate-200 border-t-amber-500 animate-spin mx-auto mb-4" />
+          <p className="text-slate-500 text-sm">Checking permissions...</p>
         </div>
       </div>
     );
@@ -178,10 +185,10 @@ export default function TrackUserPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="bg-slate-50 min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-sky-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading activity logs...</p>
+          <div className="w-8 h-8 rounded-full border-2 border-slate-200 border-t-amber-500 animate-spin mx-auto mb-4" />
+          <p className="text-slate-500 text-sm">Loading activity logs...</p>
         </div>
       </div>
     );
@@ -189,10 +196,13 @@ export default function TrackUserPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-red-600 mb-2">Error Loading Logs</h1>
-          <p className="text-gray-600">{error.message}</p>
+      <div className="bg-slate-50 min-h-screen flex items-center justify-center px-4">
+        <div className="bg-white rounded-2xl border border-red-100 p-8 text-center max-w-md">
+          <div className="w-12 h-12 bg-red-50 rounded-xl flex items-center justify-center mx-auto mb-4">
+            <X className="w-6 h-6 text-red-500" />
+          </div>
+          <h2 className="text-slate-900 font-bold text-lg mb-2">Error Loading Logs</h2>
+          <p className="text-slate-500 text-sm">{error.message}</p>
         </div>
       </div>
     );
@@ -201,177 +211,181 @@ export default function TrackUserPage() {
   const logs: ActivityLog[] = data?.userActivityLogs || [];
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="container mx-auto px-4">
-        <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-3">
-              <Activity className="w-8 h-8 text-sky-600" />
+    <div className="bg-slate-50 min-h-screen">
+      <div className="container mx-auto px-4 lg:px-16 py-8">
+        {/* Header card */}
+        <div className="bg-white rounded-2xl border border-slate-100 p-6 mb-6">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-amber-500/10 rounded-xl flex items-center justify-center border border-amber-500/20 flex-shrink-0">
+                <Activity className="w-6 h-6 text-amber-500" />
+              </div>
               <div>
-                <h1 className="text-3xl font-bold text-sky-900">User Activity Tracker</h1>
+                <h1 className="text-slate-900 text-xl font-bold">User Activity Tracker</h1>
                 {logs[0]?.user && (
-                  <p className="text-gray-600 mt-1">
-                    Tracking:{' '}
-                    <span className="font-semibold">{logs[0].user.name || 'Unknown'}</span> (
-                    {logs[0].user.email})
+                  <p className="text-slate-500 text-sm mt-0.5">
+                    <span className="font-semibold text-slate-700">
+                      {logs[0].user.name || 'Unknown'}
+                    </span>{' '}
+                    · {logs[0].user.email}
                   </p>
                 )}
-                <p className="text-sm text-gray-500">User ID: {userId}</p>
+                <p className="text-slate-400 text-xs mt-0.5">ID: {userId}</p>
               </div>
             </div>
             <Button
               onClick={downloadAsText}
-              className="flex items-center gap-2 bg-sky-900 hover:bg-sky-800 text-white px-6 py-3 rounded-lg transition-colors"
+              className="flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors disabled:opacity-50"
               disabled={logs.length === 0}
             >
-              <Download className="w-5 h-5" />
-              Download as Text File
+              <Download className="w-4 h-4" />
+              Download Log
             </Button>
           </div>
 
-          <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-4">
+          {/* Filters */}
+          <div className="bg-slate-50 rounded-xl border border-slate-100 p-4">
             <div className="flex items-center gap-2 mb-3">
-              <Calendar className="w-5 h-5 text-gray-600" />
-              <h3 className="text-sm font-semibold text-gray-700">Filter by Date Range</h3>
+              <Calendar className="w-4 h-4 text-slate-400" />
+              <span className="text-slate-600 text-sm font-semibold">Filter by Date Range</span>
             </div>
-            <div className="flex flex-wrap items-end gap-3 mb-3">
-              <div className="flex-1 min-w-[150px]">
-                <label className="block text-xs font-medium text-gray-600 mb-1">From Date</label>
+
+            <div className="flex flex-wrap gap-3 mb-3">
+              <div className="flex-1 min-w-[140px]">
+                <label className="block text-xs text-slate-500 font-medium mb-1">From</label>
                 <input
                   type="date"
                   value={dateRange.from}
                   onChange={(e) => handleDateChange('from', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500 text-sm"
+                  className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                 />
               </div>
-              <div className="flex-1 min-w-[150px]">
-                <label className="block text-xs font-medium text-gray-600 mb-1">To Date</label>
+              <div className="flex-1 min-w-[140px]">
+                <label className="block text-xs text-slate-500 font-medium mb-1">To</label>
                 <input
                   type="date"
                   value={dateRange.to}
                   onChange={(e) => handleDateChange('to', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500 text-sm"
+                  className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                 />
               </div>
             </div>
 
             <div className="flex flex-wrap gap-2">
-              <Button
-                onClick={() => handleQuickFilter('today')}
-                className="px-3 py-1.5 bg-sky-600 hover:bg-sky-700 text-white rounded-md text-xs transition-colors"
-              >
-                Today
-              </Button>
-              <Button
-                onClick={() => handleQuickFilter('yesterday')}
-                className="px-3 py-1.5 bg-sky-600 hover:bg-sky-700 text-white rounded-md text-xs transition-colors"
-              >
-                Yesterday
-              </Button>
-              <Button
-                onClick={() => handleQuickFilter('week')}
-                className="px-3 py-1.5 bg-sky-600 hover:bg-sky-700 text-white rounded-md text-xs transition-colors"
-              >
-                This Week
-              </Button>
-              <Button
-                onClick={() => handleQuickFilter('30days')}
-                className="px-3 py-1.5 bg-sky-600 hover:bg-sky-700 text-white rounded-md text-xs transition-colors"
-              >
-                30 Days
-              </Button>
-              <Button
-                onClick={() => handleQuickFilter('month')}
-                className="px-3 py-1.5 bg-sky-600 hover:bg-sky-700 text-white rounded-md text-xs transition-colors"
-              >
-                This Month
-              </Button>
-              <Button
-                onClick={() => handleQuickFilter('year')}
-                className="px-3 py-1.5 bg-sky-600 hover:bg-sky-700 text-white rounded-md text-xs transition-colors"
-              >
-                This Year
-              </Button>
+              {quickFilters.map((f) => (
+                <Button
+                  key={f.key}
+                  onClick={() => handleQuickFilter(f.key)}
+                  className="px-3 py-1.5 bg-white border border-slate-200 hover:border-amber-400 hover:text-amber-600 text-slate-600 rounded-lg text-xs font-medium transition-colors"
+                >
+                  {f.label}
+                </Button>
+              ))}
               <Button
                 onClick={handleClearFilter}
-                className="px-3 py-1.5 bg-gray-500 hover:bg-gray-600 text-white rounded-md text-xs transition-colors flex items-center gap-1"
+                className="px-3 py-1.5 bg-white border border-slate-200 hover:border-red-300 hover:text-red-500 text-slate-500 rounded-lg text-xs font-medium transition-colors flex items-center gap-1"
               >
                 <X className="w-3 h-3" />
-                Clear Filter
+                Clear
               </Button>
             </div>
 
-            {dateRange.from && dateRange.to && (
-              <p className="text-xs text-gray-500 mt-3">
-                Showing activities from {new Date(dateRange.from).toLocaleDateString()} to{' '}
-                {new Date(dateRange.to).toLocaleDateString()}
-              </p>
-            )}
-            {!dateRange.from && !dateRange.to && (
-              <p className="text-xs text-gray-500 mt-3">
-                Showing all activities (no date filter applied)
+            {(dateRange.from || dateRange.to) && (
+              <p className="text-xs text-slate-400 mt-3">
+                {dateRange.from && dateRange.to
+                  ? `${new Date(dateRange.from).toLocaleDateString()} → ${new Date(dateRange.to).toLocaleDateString()}`
+                  : dateRange.from
+                    ? `From ${new Date(dateRange.from).toLocaleDateString()}`
+                    : `Until ${new Date(dateRange.to).toLocaleDateString()}`}
               </p>
             )}
           </div>
 
-          <div className="bg-sky-50 border border-sky-200 rounded-lg p-4 mb-6">
-            <p className="text-sky-900 font-semibold">
-              Total Activities: <span className="text-2xl">{logs.length}</span>
-            </p>
+          {/* Total count */}
+          <div className="mt-4 flex items-center gap-3">
+            <div className="bg-amber-50 border border-amber-100 rounded-xl px-4 py-2.5 inline-flex items-center gap-2">
+              <Activity className="w-4 h-4 text-amber-500" />
+              <span className="text-amber-800 text-sm font-semibold">
+                {logs.length} activities found
+              </span>
+            </div>
           </div>
         </div>
 
+        {/* Table */}
         {logs.length === 0 ? (
-          <div className="bg-white rounded-lg shadow-lg p-12 text-center">
-            <Activity className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <h2 className="text-xl font-semibold text-gray-700 mb-2">No Activity Logs Found</h2>
-            <p className="text-gray-500">This user has no recorded activities yet.</p>
+          <div className="bg-white rounded-2xl border border-slate-100 p-16 text-center">
+            <div className="w-14 h-14 bg-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <Activity className="w-7 h-7 text-slate-300" />
+            </div>
+            <h2 className="text-slate-700 font-semibold mb-1">No Activity Logs Found</h2>
+            <p className="text-slate-400 text-sm">
+              This user has no recorded activities for the selected period.
+            </p>
           </div>
         ) : (
-          <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+          <div className="bg-white rounded-2xl border border-slate-100 overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-sky-900 text-white">
-                  <tr>
-                    <th className="px-4 py-3 text-left text-sm font-semibold">#</th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold">User</th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold">Date/Time</th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold">Action</th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold">Description</th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold">Path</th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold">IP Address</th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold">Details</th>
+                <thead>
+                  <tr className="bg-slate-900 text-white">
+                    <th className="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wider">
+                      #
+                    </th>
+                    <th className="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wider">
+                      User
+                    </th>
+                    <th className="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wider">
+                      Date / Time
+                    </th>
+                    <th className="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wider">
+                      Action
+                    </th>
+                    <th className="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wider">
+                      Description
+                    </th>
+                    <th className="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wider">
+                      Path
+                    </th>
+                    <th className="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wider">
+                      IP Address
+                    </th>
+                    <th className="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wider">
+                      Details
+                    </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-200">
+                <tbody className="divide-y divide-slate-100">
                   {logs.map((log, index) => (
-                    <tr key={log.id} className="hover:bg-gray-50 transition-colors">
-                      <td className="px-4 py-3 text-sm text-gray-900">{index + 1}</td>
-                      <td className="px-4 py-3 text-sm text-gray-900 font-medium">
+                    <tr key={log.id} className="hover:bg-slate-50 transition-colors">
+                      <td className="px-4 py-3 text-sm text-slate-400 font-medium">{index + 1}</td>
+                      <td className="px-4 py-3 text-sm text-slate-900 font-medium">
                         {log.userName || log.user?.name || 'Guest'}
                       </td>
-                      <td className="px-4 py-3 text-sm text-gray-900">
+                      <td className="px-4 py-3 text-sm text-slate-500 whitespace-nowrap">
                         {new Date(log.createdAt).toLocaleString()}
                       </td>
                       <td className="px-4 py-3">
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-sky-100 text-sky-800">
+                        <span
+                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border ${actionColors[log.action] || 'bg-slate-50 text-slate-600 border-slate-200'}`}
+                        >
                           {log.action}
                         </span>
                       </td>
-                      <td className="px-4 py-3 text-sm text-gray-700 max-w-xs truncate">
+                      <td className="px-4 py-3 text-sm text-slate-600 max-w-xs truncate">
                         {log.description}
                       </td>
-                      <td className="px-4 py-3 text-sm text-gray-600 max-w-xs truncate">
-                        {log.path || '-'}
+                      <td className="px-4 py-3 text-sm text-slate-400 max-w-xs truncate">
+                        {log.path || '—'}
                       </td>
-                      <td className="px-4 py-3 text-sm text-gray-600">{log.ipAddress || '-'}</td>
+                      <td className="px-4 py-3 text-sm text-slate-400">{log.ipAddress || '—'}</td>
                       <td className="px-4 py-3 text-sm">
                         {log.metadata && (
                           <details className="cursor-pointer">
-                            <summary className="text-sky-600 hover:text-sky-700 font-medium">
+                            <summary className="text-amber-500 hover:text-amber-600 font-semibold text-xs">
                               View
                             </summary>
-                            <div className="mt-2 p-2 bg-gray-50 rounded text-xs max-w-xs overflow-auto">
+                            <div className="mt-2 p-2 bg-slate-50 rounded-lg text-xs max-w-xs overflow-auto text-slate-600 border border-slate-100">
                               {log.metadata}
                             </div>
                           </details>

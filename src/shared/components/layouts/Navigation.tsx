@@ -4,59 +4,40 @@ import Link from 'next/link';
 import React, { useState } from 'react';
 import { CategoriesDropdown } from '../navigation/CategoriesDropdown';
 
+const navLinks = [
+  { href: '/', label: 'Home' },
+  { href: '/catalog', label: 'Catalog' },
+  { href: '/blog', label: 'Blog' },
+  { href: '/about-us', label: 'About Us' },
+];
+
 const Navigation = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
-  };
-
   return (
     <>
-      <div className="w-full h-16 bg-zinc-100">
-        <div className="flex justify-between items-center h-full">
-          {/* Desktop Navigation */}
-          <div className="hidden lg:flex flex-wrap">
-            <CategoriesDropdown className="ml-16" />
-            <div className="mr-20" />
-            <Link
-              href="/"
-              className="w-32 h-16 flex items-center justify-center hover:bg-amber-500 group"
-            >
-              <div className="text-slate-500 font-semibold text-base group-hover:text-white">
-                Home
-              </div>
-            </Link>
-            <Link
-              href="/catalog"
-              className="w-32 h-16 flex items-center justify-center hover:bg-amber-500 cursor-pointer group"
-            >
-              <div className="text-slate-500 font-semibold text-base group-hover:text-white">
-                Catalog
-              </div>
-            </Link>
-            <Link
-              href="/blog"
-              className="w-32 h-16 flex items-center justify-center hover:bg-amber-500 cursor-pointer group"
-            >
-              <div className="text-slate-500 font-semibold text-base group-hover:text-white">
-                Blog
-              </div>
-            </Link>
-            <Link
-              href="/about-us"
-              className="w-32 h-16 flex items-center justify-center hover:bg-amber-500 cursor-pointer group"
-            >
-              <div className="text-slate-500 font-semibold text-base group-hover:text-white">
-                About us
-              </div>
-            </Link>
+      <div className="w-full bg-white border-b border-slate-100 shadow-sm">
+        <div className="flex justify-between items-center h-14 px-4 md:px-8 lg:px-16">
+          {/* Desktop nav */}
+          <div className="hidden lg:flex items-center">
+            <CategoriesDropdown />
+            <div className="w-px h-6 bg-slate-200 mx-5" />
+            {navLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="relative px-4 h-14 flex items-center text-slate-600 font-medium text-sm hover:text-amber-500 transition-colors group"
+              >
+                {link.label}
+                <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-amber-500 scale-x-0 group-hover:scale-x-100 transition-transform duration-200 origin-left rounded-full" />
+              </Link>
+            ))}
           </div>
 
-          {/* Mobile Hamburger Button */}
+          {/* Mobile hamburger */}
           <button
-            onClick={toggleMobileMenu}
-            className="lg:hidden ml-4 p-2 text-slate-500 hover:text-slate-700 focus:outline-none"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="lg:hidden p-2 text-slate-600 hover:text-slate-900 focus:outline-none transition-colors"
             aria-label="Toggle menu"
           >
             <svg
@@ -76,64 +57,51 @@ const Navigation = () => {
             </svg>
           </button>
 
-          {/* 24/7 Support */}
-          <div className="hidden lg:flex font-semibold items-center mr-16 text-sky-800">
-            <p>24/7 Support</p>
+          {/* 24/7 Support badge */}
+          <div className="hidden lg:flex items-center gap-2 text-slate-500 text-sm font-medium">
+            <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+            24/7 Support
           </div>
         </div>
       </div>
 
-      {/* Mobile Full Screen Menu */}
+      {/* Mobile slide-down menu */}
       {isMobileMenuOpen && (
-        <div className="lg:hidden fixed inset-0 top-[152px] bg-zinc-100 z-[70] overflow-y-auto">
-          <div className="flex flex-col">
+        <div className="lg:hidden fixed inset-0 top-[136px] bg-white z-[70] overflow-y-auto shadow-2xl">
+          <div className="flex flex-col py-2">
             <Link
               href="/products"
-              onClick={toggleMobileMenu}
-              className="w-full h-16 flex items-center justify-center hover:bg-amber-500 group border-b border-zinc-200"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="flex items-center gap-3 px-6 py-4 text-slate-700 font-medium border-b border-slate-50 hover:bg-amber-50 hover:text-amber-600 transition-colors"
             >
-              <div className="text-slate-500 font-semibold text-base group-hover:text-white">
-                Browse categories
-              </div>
+              <svg
+                className="w-4 h-4 text-slate-400"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 6h16M4 12h8m-8 6h16"
+                />
+              </svg>
+              Browse Categories
             </Link>
-            <Link
-              href="/"
-              onClick={toggleMobileMenu}
-              className="w-full h-16 flex items-center justify-center hover:bg-amber-500 group border-b border-zinc-200"
-            >
-              <div className="text-slate-500 font-semibold text-base group-hover:text-white">
-                Home
-              </div>
-            </Link>
-            <Link
-              href="/catalog"
-              onClick={toggleMobileMenu}
-              className="w-full h-16 flex items-center justify-center hover:bg-amber-500 group border-b border-zinc-200"
-            >
-              <div className="text-slate-500 font-semibold text-base group-hover:text-white">
-                Catalog
-              </div>
-            </Link>
-            <Link
-              href="/blog"
-              onClick={toggleMobileMenu}
-              className="w-full h-16 flex items-center justify-center hover:bg-amber-500 cursor-pointer group border-b border-zinc-200"
-            >
-              <div className="text-slate-500 font-semibold text-base group-hover:text-white">
-                Blog
-              </div>
-            </Link>
-            <Link
-              href="/about-us"
-              onClick={toggleMobileMenu}
-              className="w-full h-16 flex items-center justify-center hover:bg-amber-500 cursor-pointer group border-b border-zinc-200"
-            >
-              <div className="text-slate-500 font-semibold text-base group-hover:text-white">
-                About us
-              </div>
-            </Link>
-            <div className="w-full h-16 flex items-center justify-center border-b border-zinc-200">
-              <div className="text-sky-800 font-semibold text-base">24/7 Support</div>
+            {navLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="flex items-center px-6 py-4 text-slate-700 font-medium border-b border-slate-50 hover:bg-amber-50 hover:text-amber-600 transition-colors"
+              >
+                {link.label}
+              </Link>
+            ))}
+            <div className="flex items-center gap-2 px-6 py-4 text-slate-500 text-sm font-medium">
+              <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+              24/7 Support
             </div>
           </div>
         </div>

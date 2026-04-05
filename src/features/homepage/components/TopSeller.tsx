@@ -1,90 +1,121 @@
-import Button from '@/shared/components/elements/Button';
-import { Card } from '@/shared/components/elements/Card';
-import DotSlide from '@/shared/components/elements/DotSlide';
 import Star from '@/shared/components/elements/Star';
-import { EyeIcon, ShoppingCartIcon } from '@/shared/components/icons';
+import { ShoppingCartIcon, EyeIcon } from '@/shared/components/icons';
 import React from 'react';
+
+const sideProducts = [
+  {
+    title: 'Gaming Setup',
+    price: '$299.00',
+    image: '/assets/img/ps4c.png',
+  },
+  {
+    title: 'Premium Laptop',
+    price: '$899.00',
+    image: '/assets/img/5-1.png',
+  },
+];
 
 const TopSeller = () => {
   return (
-    <div className="container mx-auto px-4">
-      <div className="flex flex-col lg:flex-row justify-center items-center gap-5 mb-5">
-        <Card className="w-full lg:w-[830px] min-h-[500px] justify-center items-center gap-6 md:gap-10 flex flex-col md:flex-row relative p-4 md:p-6">
-          <img
-            className="p-3 rounded-2xl max-w-[250px] md:max-w-[350px]"
-            src="/assets/img/jbl-bar.png"
-            alt="JBL bar"
-          />
-          <div className="justify-center items-center flex absolute bottom-4 md:bottom-10">
-            <DotSlide count={1} />
+    <section className="container mx-auto px-4 py-8">
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <p className="text-amber-500 text-sm font-semibold uppercase tracking-widest mb-1">
+            Trending Now
+          </p>
+          <h2 className="text-slate-900 text-2xl md:text-3xl font-bold">Top Sellers</h2>
+        </div>
+      </div>
+
+      <div className="flex flex-col lg:flex-row gap-5">
+        {/* Main featured product card */}
+        <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-3xl p-8 md:p-10 flex flex-col md:flex-row items-center gap-8 flex-1 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+
+          {/* Product image with glow */}
+          <div className="relative z-10 flex-shrink-0 flex items-center justify-center">
+            <div className="absolute w-44 h-44 bg-amber-500/20 rounded-full blur-2xl" />
+            <img
+              className="relative w-44 md:w-56 drop-shadow-2xl"
+              src="/assets/img/jbl-bar.png"
+              alt="JBL bar"
+            />
           </div>
-          <div className="flex-col justify-center items-center md:items-start gap-6 md:gap-9 inline-flex">
-            <div className="flex-col justify-center items-center md:items-start gap-3 md:gap-4 flex">
-              <div className="text-sky-900 text-lg md:text-xl font-semibold text-center md:text-left">
-                JBL bar 2.1 deep bass
-              </div>
-              <div className="text-neutral-600 text-base md:text-lg font-semibold">$11,70</div>
+
+          {/* Product details */}
+          <div className="relative z-10 flex-1 text-center md:text-left">
+            <div className="inline-flex px-3 py-1 bg-amber-500/20 text-amber-400 text-xs font-semibold rounded-full mb-4 border border-amber-500/30">
+              BEST SELLER
+            </div>
+            <h3 className="text-white text-xl md:text-2xl font-bold mb-1">JBL Bar 2.1 Deep Bass</h3>
+            <p className="text-slate-400 text-sm mb-3">Premium audio experience for your home</p>
+            <div className="text-amber-400 text-2xl font-bold mb-2">$11.70</div>
+            <div className="mb-5">
               <Star count={5} />
             </div>
-            <div className="justify-center items-center gap-2 md:gap-3 flex flex-wrap">
-              <button className="w-16 h-16 md:w-20 md:h-20 bg-sky-100 rounded-full justify-center items-center hover:bg-sky-200">
-                <div className="text-amber-500 text-xl md:text-2xl font-bold">57</div>
-              </button>
-              <button className="w-16 h-16 md:w-20 md:h-20 bg-sky-100 rounded-full justify-center items-center hover:bg-sky-200">
-                <div className="text-amber-500 text-xl md:text-2xl font-bold">11</div>
-              </button>
-              <button className="w-16 h-16 md:w-20 md:h-20 bg-sky-100 rounded-full justify-center items-center hover:bg-sky-200">
-                <div className="text-amber-500 text-xl md:text-2xl font-bold">33</div>
-              </button>
-              <button className="w-16 h-16 md:w-20 md:h-20 bg-sky-100 rounded-full justify-center items-center hover:bg-sky-200">
-                <div className="text-amber-500 text-xl md:text-2xl font-bold">59</div>
-              </button>
+
+            {/* Countdown */}
+            <div className="flex justify-center md:justify-start gap-3 mb-7">
+              {[
+                { v: '57', l: 'Days' },
+                { v: '11', l: 'Hrs' },
+                { v: '33', l: 'Min' },
+                { v: '59', l: 'Sec' },
+              ].map(({ v, l }) => (
+                <div
+                  key={l}
+                  className="bg-slate-700/60 backdrop-blur-sm rounded-xl px-3 py-2 text-center min-w-[54px] border border-slate-600/50"
+                >
+                  <div className="text-amber-400 text-xl font-bold">{v}</div>
+                  <div className="text-slate-400 text-xs">{l}</div>
+                </div>
+              ))}
             </div>
-            <div className="justify-center items-center gap-3 md:gap-5 flex">
-              <Button className="w-44 md:w-56 h-12 md:h-14 pl-4 md:pl-6 pr-2 justify-between flex items-center bg-blue-300 hover:bg-blue-400 text-slate-800 text-sm md:text-base font-semibold">
-                <span>Add to cart</span>
-                <div className="w-7 h-7 md:w-8 md:h-8 bg-amber-500 rounded-full justify-center items-center flex">
+
+            <div className="flex justify-center md:justify-start items-center gap-3">
+              <button className="flex items-center gap-2 px-6 h-11 bg-amber-500 text-white font-semibold rounded-2xl hover:bg-amber-400 transition-colors shadow-lg shadow-amber-500/30">
+                <div className="w-5 h-5">
                   <ShoppingCartIcon />
                 </div>
-              </Button>
-              <Button className="w-12 md:w-16 h-12 md:h-14 bg-blue-300 justify-center flex items-center hover:bg-blue-400">
-                <EyeIcon />
-              </Button>
-            </div>
-          </div>
-        </Card>
-        <div className="flex flex-col gap-5 w-full lg:w-auto">
-          <div className="w-full lg:w-[500px] min-h-[200px] md:h-60 rounded-2xl border border-zinc-400 flex-col justify-center items-center gap-4 inline-flex cursor-pointer hover:bg-slate-100 p-4">
-            <div className="flex flex-col sm:flex-row justify-start items-center gap-6 md:gap-12 w-full">
-              <img
-                className="w-full sm:w-48 md:w-72 h-auto max-h-44 p-2 relative rounded-2xl object-cover"
-                src="https://source.unsplash.com/288x176?gaming"
-                alt="Gaming"
-              />
-              <div className="flex-col justify-center items-center sm:items-start gap-3 md:gap-4 inline-flex">
-                <div className="text-sky-900 text-base md:text-lg font-medium">Play game</div>
-                <div className="text-neutral-600 text-base md:text-lg font-semibold">$11,70</div>
-                <Star count={5} />
-              </div>
-            </div>
-          </div>
-          <div className="w-full lg:w-[500px] min-h-[200px] md:h-60 rounded-2xl border border-zinc-400 flex-col justify-center items-center gap-4 inline-flex cursor-pointer hover:bg-slate-100 p-4">
-            <div className="flex flex-col sm:flex-row justify-start items-center gap-6 md:gap-12 w-full">
-              <img
-                className="w-full sm:w-48 md:w-72 h-auto max-h-44 p-2 relative rounded-2xl object-cover"
-                src="https://source.unsplash.com/288x176?laptop"
-                alt="Laptop"
-              />
-              <div className="flex-col justify-center items-center sm:items-start gap-3 md:gap-4 inline-flex">
-                <div className="text-sky-900 text-base md:text-lg font-medium">Play game</div>
-                <div className="text-neutral-600 text-base md:text-lg font-semibold">$11,70</div>
-                <Star count={5} />
-              </div>
+                Add to Cart
+              </button>
+              <button className="w-11 h-11 bg-slate-700 hover:bg-slate-600 transition-colors rounded-2xl flex items-center justify-center text-slate-300">
+                <div className="w-5 h-5">
+                  <EyeIcon />
+                </div>
+              </button>
             </div>
           </div>
         </div>
+
+        {/* Side product cards */}
+        <div className="flex flex-col gap-4 lg:w-80">
+          {sideProducts.map((item) => (
+            <div
+              key={item.title}
+              className="bg-white border border-slate-100 rounded-2xl p-5 flex items-center gap-5 cursor-pointer hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 group"
+            >
+              <div className="w-24 h-24 bg-slate-50 rounded-xl flex-shrink-0 flex items-center justify-center overflow-hidden">
+                <img
+                  src={item.image}
+                  alt={item.title}
+                  className="w-20 h-20 object-contain group-hover:scale-110 transition-transform duration-300"
+                />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h4 className="text-slate-800 font-semibold mb-1 group-hover:text-amber-500 transition-colors truncate">
+                  {item.title}
+                </h4>
+                <div className="mb-2">
+                  <Star count={5} />
+                </div>
+                <div className="text-slate-900 font-bold">{item.price}</div>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
-    </div>
+    </section>
   );
 };
 

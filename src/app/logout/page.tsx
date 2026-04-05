@@ -6,7 +6,6 @@ import { useAuth } from '@/shared/contexts/AuthContext';
 import { useActivityTracker } from '@/shared/hooks/useActivityTracker';
 import { LogOut } from 'lucide-react';
 import Link from 'next/link';
-import Button from '@/shared/components/elements/Button';
 
 export default function LogoutPage() {
   const router = useRouter();
@@ -14,7 +13,6 @@ export default function LogoutPage() {
   const { trackActivity } = useActivityTracker();
 
   useEffect(() => {
-    // Track logout before actually logging out
     if (user) {
       trackActivity({
         action: 'LOGOUT',
@@ -22,10 +20,8 @@ export default function LogoutPage() {
       });
     }
 
-    // Call logout immediately
     logout();
 
-    // Redirect to home after 2 seconds
     const timer = setTimeout(() => {
       router.push('/');
     }, 2000);
@@ -34,22 +30,37 @@ export default function LogoutPage() {
   }, [logout, router]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-sky-50 to-white flex items-center justify-center">
-      <div className="text-center">
-        <div className="w-24 h-24 mx-auto bg-gradient-to-br from-sky-100 to-cyan-100 rounded-full flex items-center justify-center mb-6 animate-pulse">
-          <LogOut className="w-12 h-12 text-sky-600" />
+    <div className="bg-slate-50 min-h-screen flex items-center justify-center px-4">
+      <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-12 max-w-md w-full text-center">
+        {/* Icon */}
+        <div className="w-20 h-20 mx-auto bg-amber-500/10 rounded-2xl flex items-center justify-center mb-6 border border-amber-500/20">
+          <LogOut className="w-9 h-9 text-amber-500" />
         </div>
-        <h1 className="text-4xl font-bold text-sky-900 mb-4">Logging Out...</h1>
-        <p className="text-gray-600 text-lg mb-8">
-          You have been successfully logged out. Redirecting to home page...
+
+        <h1 className="text-slate-900 text-2xl font-bold mb-2">Logging Out...</h1>
+        <p className="text-slate-500 text-sm mb-8">
+          You have been successfully signed out. Redirecting you to the homepage shortly.
         </p>
-        <div className="flex justify-center mb-6">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-sky-600"></div>
+
+        {/* Spinner */}
+        <div className="flex justify-center mb-8">
+          <div className="w-8 h-8 rounded-full border-2 border-slate-200 border-t-amber-500 animate-spin" />
         </div>
-        <Link href="/">
-          <Button className="bg-sky-900 hover:bg-sky-800 text-white px-8 py-3 text-lg font-medium rounded-lg transition-colors shadow-lg hover:shadow-xl">
-            Go to Homepage
-          </Button>
+
+        <Link
+          href="/"
+          className="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-400 text-white font-semibold px-6 py-2.5 rounded-xl transition-colors shadow-sm shadow-amber-500/30 text-sm"
+        >
+          Go to Homepage
+          <svg
+            className="w-4 h-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+          </svg>
         </Link>
       </div>
     </div>

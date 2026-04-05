@@ -26,6 +26,46 @@ interface Order {
   items: OrderItem[];
 }
 
+const getStatusStyle = (status: string) => {
+  switch (status.toUpperCase()) {
+    case 'PENDING':
+      return 'bg-amber-100 text-amber-700 border border-amber-200';
+    case 'PROCESSING':
+      return 'bg-blue-100 text-blue-700 border border-blue-200';
+    case 'SHIPPED':
+      return 'bg-violet-100 text-violet-700 border border-violet-200';
+    case 'DELIVERED':
+      return 'bg-green-100 text-green-700 border border-green-200';
+    case 'CANCELLED':
+      return 'bg-red-100 text-red-700 border border-red-200';
+    default:
+      return 'bg-slate-100 text-slate-600 border border-slate-200';
+  }
+};
+
+const getPaymentStatusStyle = (status: string) => {
+  switch (status.toUpperCase()) {
+    case 'PAID':
+      return 'bg-green-100 text-green-700 border border-green-200';
+    case 'PENDING':
+      return 'bg-amber-100 text-amber-700 border border-amber-200';
+    case 'FAILED':
+      return 'bg-red-100 text-red-700 border border-red-200';
+    case 'REFUNDED':
+      return 'bg-slate-100 text-slate-600 border border-slate-200';
+    default:
+      return 'bg-slate-100 text-slate-600 border border-slate-200';
+  }
+};
+
+const formatDate = (dateString: string) => {
+  return new Date(dateString).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+};
+
 export default function OrdersTab() {
   const { data, loading, error } = useQuery<{ orders: Order[] }>(GET_ORDERS, {
     fetchPolicy: 'network-only',
@@ -55,65 +95,40 @@ export default function OrdersTab() {
   if (error) {
     return (
       <div className="text-center py-20">
-        <p className="text-red-600">Failed to load orders. Please try again.</p>
+        <div className="w-16 h-16 mx-auto bg-red-50 rounded-full flex items-center justify-center mb-4">
+          <svg
+            className="w-8 h-8 text-red-400"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+            />
+          </svg>
+        </div>
+        <p className="text-slate-600 font-medium">Failed to load orders.</p>
+        <p className="text-slate-400 text-sm mt-1">Please try again later.</p>
       </div>
     );
   }
 
   const orders = data?.orders || [];
 
-  const getStatusColor = (status: string) => {
-    switch (status.toUpperCase()) {
-      case 'PENDING':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'PROCESSING':
-        return 'bg-blue-100 text-blue-800';
-      case 'SHIPPED':
-        return 'bg-purple-100 text-purple-800';
-      case 'DELIVERED':
-        return 'bg-green-100 text-green-800';
-      case 'CANCELLED':
-        return 'bg-red-100 text-red-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
-  };
-
-  const getPaymentStatusColor = (status: string) => {
-    switch (status.toUpperCase()) {
-      case 'PAID':
-        return 'bg-green-100 text-green-800';
-      case 'PENDING':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'FAILED':
-        return 'bg-red-100 text-red-800';
-      case 'REFUNDED':
-        return 'bg-gray-100 text-gray-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
-  };
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
-  };
-
   if (orders.length === 0) {
     return (
       <div className="text-center py-20">
-        <div className="w-32 h-32 mx-auto mb-6 bg-gray-100 rounded-full flex items-center justify-center">
-          <Package className="w-16 h-16 text-gray-400" />
+        <div className="w-20 h-20 mx-auto bg-slate-100 rounded-full flex items-center justify-center mb-5">
+          <Package className="w-10 h-10 text-slate-400" />
         </div>
-        <h3 className="text-2xl font-semibold text-gray-900 mb-2">No orders yet</h3>
-        <p className="text-gray-500 mb-6">Start shopping to see your orders here!</p>
+        <h3 className="text-xl font-bold text-slate-900 mb-2">No orders yet</h3>
+        <p className="text-slate-500 mb-6">Start shopping to see your orders here!</p>
         <Link
           href="/products"
-          className="inline-block bg-sky-900 text-white px-6 py-3 rounded-lg hover:bg-sky-800 transition font-semibold"
+          className="inline-block bg-amber-500 hover:bg-amber-400 text-white font-semibold px-7 py-3 rounded-2xl transition-colors shadow-lg shadow-amber-500/30"
         >
           Start Shopping
         </Link>
@@ -122,12 +137,12 @@ export default function OrdersTab() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-semibold text-sky-900">Order History</h2>
-        <p className="text-gray-500">
+    <div className="space-y-4">
+      <div className="flex justify-between items-center mb-2">
+        <h2 className="text-xl font-bold text-slate-900">Order History</h2>
+        <span className="text-slate-400 text-sm">
           {orders.length} order{orders.length !== 1 ? 's' : ''}
-        </p>
+        </span>
       </div>
 
       {orders.map((order) => {
@@ -135,99 +150,106 @@ export default function OrdersTab() {
         return (
           <div
             key={order.id}
-            className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow"
+            className="bg-white border border-slate-100 rounded-2xl overflow-hidden hover:border-amber-200 hover:shadow-lg transition-all duration-300"
           >
+            {/* Order header — clickable */}
             <div
-              className="bg-gray-50 px-6 py-4 cursor-pointer hover:bg-gray-100 transition-colors"
+              className="px-6 py-5 cursor-pointer hover:bg-slate-50 transition-colors"
               onClick={() => toggleOrder(order.id)}
             >
               <div className="flex flex-wrap justify-between items-center gap-4">
-                <div className="flex items-center gap-6 flex-grow">
+                <div className="flex flex-wrap items-center gap-6">
                   <div>
-                    <p className="text-sm text-gray-500">Order Number</p>
-                    <p className="text-lg font-bold text-sky-900">{order.orderNumber}</p>
+                    <p className="text-xs text-slate-400 font-medium mb-0.5">Order</p>
+                    <p className="text-slate-900 font-bold">{order.orderNumber}</p>
                   </div>
-                  <div className="flex items-center gap-2 text-sm text-gray-600">
-                    <Calendar className="w-4 h-4" />
+                  <div className="flex items-center gap-1.5 text-slate-500 text-sm">
+                    <Calendar className="w-4 h-4 flex-shrink-0" />
                     <span>{formatDate(order.createdAt)}</span>
                   </div>
-                  <div className="flex items-center gap-2 text-sm">
-                    <CreditCard className="w-4 h-4 text-gray-600" />
-                    <span className="font-semibold text-gray-900">€{order.total.toFixed(2)}</span>
+                  <div className="flex items-center gap-1.5 text-sm">
+                    <CreditCard className="w-4 h-4 text-slate-400 flex-shrink-0" />
+                    <span className="font-bold text-slate-900">€{order.total.toFixed(2)}</span>
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-3">
                   <span
-                    className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(order.status)}`}
+                    className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusStyle(order.status)}`}
                   >
                     {order.status}
                   </span>
-                  {isExpanded ? (
-                    <ChevronUp className="w-5 h-5 text-gray-500" />
-                  ) : (
-                    <ChevronDown className="w-5 h-5 text-gray-500" />
-                  )}
+                  <div className="text-slate-400">
+                    {isExpanded ? (
+                      <ChevronUp className="w-5 h-5" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5" />
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
 
+            {/* Expanded details */}
             {isExpanded && (
-              <div className="p-6">
-                <div className="flex items-center gap-6 text-sm mb-4">
-                  <div className="flex items-center gap-2">
-                    <Package className="w-4 h-4 text-gray-600" />
-                    <span className="text-gray-600">
+              <div className="border-t border-slate-100 px-6 py-5">
+                {/* Meta row */}
+                <div className="flex flex-wrap items-center gap-5 mb-5">
+                  <div className="flex items-center gap-1.5 text-slate-500 text-sm">
+                    <Package className="w-4 h-4" />
+                    <span>
                       {order.items.length} item{order.items.length !== 1 ? 's' : ''}
                     </span>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-gray-600">Payment Status:</span>
+                  <div className="flex items-center gap-2 text-sm">
+                    <span className="text-slate-400">Payment:</span>
                     <span
-                      className={`px-3 py-1 rounded-full text-xs font-semibold ${getPaymentStatusColor(order.paymentStatus)}`}
+                      className={`px-2.5 py-0.5 rounded-full text-xs font-semibold ${getPaymentStatusStyle(order.paymentStatus)}`}
                     >
                       {order.paymentStatus}
                     </span>
                   </div>
                 </div>
 
-                <div className="space-y-3 mb-4">
+                {/* Order items */}
+                <div className="space-y-3 mb-5">
                   {order.items.map((item) => (
                     <div
                       key={item.id}
-                      className="flex items-center gap-4 py-3 border-b border-gray-100 last:border-0"
+                      className="flex items-center gap-4 py-3 border-b border-slate-50 last:border-0"
                     >
-                      <div className="w-16 h-16 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
+                      <div className="w-14 h-14 bg-slate-50 rounded-xl overflow-hidden flex items-center justify-center flex-shrink-0">
                         {item.image ? (
                           <Image
                             src={item.image}
                             alt={item.name}
-                            width={64}
-                            height={64}
-                            className="w-full h-full object-contain"
+                            width={56}
+                            height={56}
+                            className="w-full h-full object-contain p-1"
                           />
                         ) : (
-                          <div className="w-full h-full flex items-center justify-center">
-                            <Package className="w-8 h-8 text-gray-400" />
-                          </div>
+                          <Package className="w-7 h-7 text-slate-300" />
                         )}
                       </div>
-                      <div className="flex-grow">
-                        <h4 className="font-medium text-gray-900">{item.name}</h4>
-                        <p className="text-sm text-gray-500">Quantity: {item.quantity}</p>
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-semibold text-slate-900 text-sm truncate">
+                          {item.name}
+                        </h4>
+                        <p className="text-slate-400 text-xs mt-0.5">Qty: {item.quantity}</p>
                       </div>
-                      <div className="text-right">
-                        <p className="font-semibold text-gray-900">€{item.price.toFixed(2)}</p>
-                        <p className="text-sm text-gray-500">each</p>
+                      <div className="text-right flex-shrink-0">
+                        <p className="font-bold text-slate-900">€{item.price.toFixed(2)}</p>
+                        <p className="text-slate-400 text-xs">each</p>
                       </div>
                     </div>
                   ))}
                 </div>
 
-                <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
-                  <button className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition font-medium text-sm">
+                {/* Actions */}
+                <div className="flex justify-end gap-3 pt-2">
+                  <button className="px-4 py-2 border border-slate-200 text-slate-600 hover:bg-slate-50 rounded-xl transition-colors font-medium text-sm">
                     View Details
                   </button>
-                  <button className="px-4 py-2 bg-sky-900 text-white rounded-lg hover:bg-sky-800 transition font-medium text-sm">
+                  <button className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl transition-colors font-medium text-sm">
                     Download Invoice
                   </button>
                 </div>

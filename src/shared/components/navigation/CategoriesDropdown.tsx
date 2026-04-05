@@ -52,7 +52,7 @@ export const CategoriesDropdown: React.FC<CategoriesDropdownProps> = ({ classNam
       id: category.id,
       label: category.name,
       href: `/products?category=${category.id}`,
-      description: `Shop ${category.name.toLowerCase()} products`,
+      description: `${getCategoryCount(category.id)} products available`,
       icon: (
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path
@@ -67,9 +67,17 @@ export const CategoriesDropdown: React.FC<CategoriesDropdownProps> = ({ classNam
   ];
 
   const trigger = (
-    <div className="w-52 h-16 bg-amber-500 flex items-center justify-center hover:bg-amber-600 transition-all duration-200 cursor-pointer group">
-      <div className="text-white font-semibold text-base mr-3">Browse categories</div>
-      <span className="text-white w-4 h-4 transition-transform duration-200 group-hover:rotate-180 inline-block">
+    <div className="flex items-center gap-2 bg-amber-500 hover:bg-amber-400 text-white font-semibold text-sm px-5 py-2.5 rounded-full cursor-pointer transition-all duration-200 shadow-sm shadow-amber-500/30 group select-none">
+      <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M4 6h16M4 12h16M4 18h16"
+        />
+      </svg>
+      Browse Categories
+      <span className="w-4 h-4 flex-shrink-0 transition-transform duration-200 group-hover:rotate-180 inline-block">
         <ChevronDownIcon />
       </span>
     </div>
@@ -82,7 +90,7 @@ export const CategoriesDropdown: React.FC<CategoriesDropdownProps> = ({ classNam
         items={categoryItems}
         loading={loading}
         emptyMessage={error ? 'Failed to load categories' : 'No categories available'}
-        dropdownClassName="border-0 shadow-2xl backdrop-blur-sm"
+        dropdownClassName="border-0 shadow-2xl"
         maxHeight="max-h-96"
         placement="bottom-left"
         openOnHover={true}

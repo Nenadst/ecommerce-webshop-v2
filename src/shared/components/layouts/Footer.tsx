@@ -4,10 +4,10 @@ import FooterMenu from './FooterMenu';
 
 const Footer = () => {
   return (
-    <div className="bg-sky-100">
+    <footer className="bg-slate-900">
       <Newsletter />
       <FooterMenu />
-    </div>
+    </footer>
   );
 };
 

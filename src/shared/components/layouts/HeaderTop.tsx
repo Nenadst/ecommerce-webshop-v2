@@ -3,26 +3,36 @@ import { LocationIcon, TruckDeliveryIcon } from '../icons';
 
 const HeaderTop = () => {
   return (
-    <div className="justify-between h-12 m-auto mr-16 ml-16 hidden lg:flex md:flex">
-      <div className="flex justify-center items-center">
-        <div className="text-slate-600 text-sm hover:text-blue-600 cursor-pointer">
-          Need help? Call us: (+98) 0234 456 789
+    <div className="bg-slate-950 border-b border-slate-800/50 hidden lg:block">
+      <div className="container mx-auto px-4 lg:px-16 h-9 flex items-center justify-between">
+        {/* Left — phone */}
+        <div className="text-slate-400 text-xs">
+          Need help?{' '}
+          <span className="text-amber-400 font-medium cursor-pointer hover:text-amber-300 transition-colors">
+            (+98) 0234 456 789
+          </span>
         </div>
-      </div>
-      <div className="justify-center items-center gap-5 flex">
-        <div className="w-32 h-10 rounded-lg justify-center items-center gap-3 flex hover:bg-slate-300 cursor-pointer">
-          <div className="justify-center items-center flex">
-            <LocationIcon />
-          </div>
-          <div className="text-slate-600 text-sm font-normal">Our store</div>
+
+        {/* Center — promo pill */}
+        <div className="inline-flex items-center gap-1.5 bg-amber-500/15 text-amber-400 text-xs font-medium px-3 py-1 rounded-full border border-amber-500/25">
+          🚚 Free shipping on orders over $50
         </div>
-        <div className="justify-center items-center gap-3 flex">
-          <div className="w-44 h-10 rounded-lg justify-center items-center gap-3 flex hover:bg-slate-300 cursor-pointer">
-            <div className="justify-center items-center flex">
+
+        {/* Right — store + tracking */}
+        <div className="flex items-center gap-5">
+          <button className="flex items-center gap-1.5 text-slate-400 hover:text-slate-200 transition-colors text-xs">
+            <span className="flex-shrink-0 flex items-center justify-center">
+              <LocationIcon />
+            </span>
+            Our store
+          </button>
+          <div className="w-px h-3.5 bg-slate-700" />
+          <button className="flex items-center gap-1.5 text-slate-400 hover:text-slate-200 transition-colors text-xs">
+            <span className="flex-shrink-0 flex items-center justify-center">
               <TruckDeliveryIcon />
-            </div>
-            <div className="text-slate-600 text-sm font-normal">Track your order</div>
-          </div>
+            </span>
+            Track your order
+          </button>
         </div>
       </div>
     </div>

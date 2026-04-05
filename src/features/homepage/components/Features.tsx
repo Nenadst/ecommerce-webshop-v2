@@ -1,61 +1,43 @@
 import { BestQualityIcon, FreeDeliveryIcon, WarrantyIcon } from '@/shared/components/icons';
 import React from 'react';
 
+const features = [
+  {
+    icon: <FreeDeliveryIcon />,
+    title: 'Free Delivery',
+    desc: 'On orders above $50',
+  },
+  {
+    icon: <BestQualityIcon />,
+    title: 'Best Quality',
+    desc: 'Premium products, low prices',
+  },
+  {
+    icon: <WarrantyIcon />,
+    title: '1 Year Warranty',
+    desc: 'Full coverage on all items',
+  },
+];
+
 const Features = () => {
   return (
-    <div className="container mx-auto px-4">
-      <div className="flex p-4 md:p-10">
-        <div className="w-full lg:w-[93%] min-h-40 bg-sky-100 rounded-2xl justify-center items-center gap-6 md:gap-12 lg:gap-24 flex flex-col md:flex-row m-auto p-6 md:p-8">
-          <div className="justify-start items-center gap-4 md:gap-8 flex w-full md:w-auto">
-            <div className="w-12 h-12 md:w-16 md:h-16 flex-shrink-0 justify-center items-center flex">
-              <div className="w-12 h-12 md:w-16 md:h-16 relative">
-                <div className="w-10 h-10 md:w-12 md:h-12 left-[2px] top-[2px] md:left-[5.58px] md:top-[5.67px] absolute">
-                  <FreeDeliveryIcon />
-                </div>
+    <section className="container mx-auto px-4 py-6">
+      <div className="bg-gradient-to-r from-slate-900 to-slate-800 rounded-3xl p-8 md:p-10">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-4">
+          {features.map((feat, i) => (
+            <div key={i} className="flex items-center gap-5">
+              <div className="w-14 h-14 bg-amber-500/20 rounded-2xl flex items-center justify-center flex-shrink-0 border border-amber-500/30 overflow-hidden p-2.5 text-amber-400">
+                {feat.icon}
+              </div>
+              <div>
+                <div className="text-white text-base md:text-lg font-semibold">{feat.title}</div>
+                <div className="text-slate-400 text-sm">{feat.desc}</div>
               </div>
             </div>
-            <div className="flex-col justify-center items-start gap-1 md:gap-1.5 inline-flex">
-              <div className="text-sky-900 text-lg md:text-xl lg:text-2xl font-semibold">
-                Free delivery
-              </div>
-              <div className="text-sky-900 text-sm md:text-base lg:text-lg font-normal">
-                on order above $50,00
-              </div>
-            </div>
-          </div>
-          <div className="justify-start items-center gap-4 md:gap-8 flex w-full md:w-auto">
-            <div className="w-12 h-12 md:w-16 md:h-16 flex-shrink-0 justify-center items-center flex">
-              <div className="w-12 h-12 md:w-16 md:h-16 relative">
-                <BestQualityIcon />
-              </div>
-            </div>
-            <div className="flex-col justify-center items-start gap-1 md:gap-1.5 inline-flex">
-              <div className="text-sky-900 text-lg md:text-xl lg:text-2xl font-semibold">
-                Best quality{' '}
-              </div>
-              <div className="text-sky-900 text-sm md:text-base lg:text-lg font-normal">
-                best quality in low price
-              </div>
-            </div>
-          </div>
-          <div className="justify-start items-center gap-4 md:gap-8 flex w-full md:w-auto">
-            <div className="w-12 h-12 md:w-16 md:h-16 flex-shrink-0 justify-center items-center flex">
-              <div className="w-12 h-12 md:w-16 md:h-16 relative">
-                <WarrantyIcon />
-              </div>
-            </div>
-            <div className="flex-col justify-center items-start gap-1 md:gap-1.5 inline-flex">
-              <div className="text-sky-900 text-lg md:text-xl lg:text-2xl font-semibold">
-                1 year warranty
-              </div>
-              <div className="text-sky-900 text-sm md:text-base lg:text-lg font-normal">
-                Avaliable warranty
-              </div>
-            </div>
-          </div>
+          ))}
         </div>
       </div>
-    </div>
+    </section>
   );
 };
 

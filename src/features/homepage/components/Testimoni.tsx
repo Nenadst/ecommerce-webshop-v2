@@ -1,41 +1,47 @@
 import React from 'react';
 import { TESTIMONI } from '@/data/testimoni';
-import { Card } from '@/shared/components/elements/Card';
-import DotSlide from '@/shared/components/elements/DotSlide';
 
 const Testimoni = () => {
   return (
-    <div className="container mx-auto px-4">
-      <div className="w-full min-h-60 justify-center items-stretch gap-4 md:gap-5 flex flex-col md:flex-row mb-5">
+    <section className="container mx-auto px-4 py-8">
+      <div className="text-center mb-8">
+        <p className="text-amber-500 text-sm font-semibold uppercase tracking-widest mb-2">
+          Testimonials
+        </p>
+        <h2 className="text-slate-900 text-2xl md:text-3xl font-bold">What Our Customers Say</h2>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
         {TESTIMONI.map((testimoni, index) => (
-          <Card
+          <div
             key={index}
-            className="w-full md:w-[440px] min-h-60 flex-col justify-center items-start flex hover:bg-slate-100 cursor-pointer p-4"
+            className="bg-white border border-slate-100 rounded-2xl p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 cursor-pointer group"
           >
-            <div className="justify-center md:justify-start items-center gap-6 md:gap-9 flex w-full mb-4">
-              <div className="w-20 h-20 md:w-24 md:h-24 flex-shrink-0 relative">
-                <div className="w-20 h-20 md:w-24 md:h-24 left-0 top-0 absolute rounded-full border-2 border-amber-500">
-                  <img
-                    className="w-16 h-16 md:w-20 md:h-20 left-[4px] top-[4px] md:left-[6.54px] md:top-[6.54px] absolute rounded-full object-cover"
-                    src={testimoni.image}
-                    alt={testimoni.name}
-                  />
+            {/* Opening quote */}
+            <div className="text-amber-400 text-5xl font-serif leading-none mb-3 select-none">
+              &ldquo;
+            </div>
+            <p className="text-slate-500 text-sm leading-relaxed mb-6">{testimoni.description}</p>
+            {/* Author row */}
+            <div className="flex items-center gap-3">
+              <div className="w-11 h-11 rounded-full overflow-hidden border-2 border-amber-400 flex-shrink-0">
+                <img
+                  className="w-full h-full object-cover"
+                  src={testimoni.image}
+                  alt={testimoni.name}
+                />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="text-slate-800 text-sm font-semibold truncate">
+                  {testimoni.name}
                 </div>
+                <div className="text-slate-400 text-xs">Verified Buyer</div>
               </div>
-              <div className="flex-1 text-sky-900 text-sm md:text-base font-medium">
-                {testimoni.name}
-              </div>
+              <div className="text-amber-400 text-xs font-semibold flex-shrink-0">★★★★★</div>
             </div>
-            <div className="w-full min-h-20 bg-sky-100 rounded-2xl justify-center items-center flex">
-              <div className="w-full p-3 md:p-4 text-sky-900 text-xs md:text-sm font-normal">
-                {testimoni.description}
-              </div>
-            </div>
-          </Card>
+          </div>
         ))}
       </div>
-      <DotSlide className="p-5 m-auto" count={4} />
-    </div>
+    </section>
   );
 };
 

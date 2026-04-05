@@ -1,43 +1,38 @@
 'use client';
 
-import Button from '@/shared/components/elements/Button';
-import React from 'react';
+import React, { useState } from 'react';
+
+const filters = ['All', 'Cameras', 'Laptops', 'Tablets', 'Speakers'];
 
 const PopularProduct = () => {
+  const [active, setActive] = useState('All');
+
   return (
-    <div className="container mx-auto px-4">
-      <div className="w-full lg:w-11/12 justify-between m-auto flex flex-col lg:flex-row items-center gap-4 lg:gap-0 mt-5 mb-5 p-4 md:p-10">
-        <div className="text-cyan-800 text-2xl md:text-3xl font-semibold text-center lg:text-left">
-          Popular products
+    <section className="container mx-auto px-4 py-4 mt-2">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5">
+        <div>
+          <p className="text-amber-500 text-sm font-semibold uppercase tracking-widest mb-1">
+            Our Collection
+          </p>
+          <h2 className="text-slate-900 text-2xl md:text-3xl font-bold">Popular Products</h2>
         </div>
-        <div className="flex flex-wrap justify-center items-center gap-2 md:gap-3">
-          <Button
-            onClick={() => {}}
-            className="w-28 md:w-36 h-11 border border-sky-900 text-sky-900 text-sm md:text-base font-medium hover:bg-slate-200"
-          >
-            Cameras
-          </Button>
-          <Button
-            onClick={() => {}}
-            className="w-28 md:w-36 h-11 border border-sky-900 text-sky-900 text-sm md:text-base font-medium hover:bg-slate-200"
-          >
-            Laptops
-          </Button>
-          <Button
-            onClick={() => {}}
-            className="w-28 md:w-36 h-11 border border-sky-900 text-sky-900 text-sm md:text-base font-medium hover:bg-slate-200"
-          >
-            Tablets
-          </Button>
-          <Button
-            onClick={() => {}}
-            className="w-28 md:w-36 h-11 border border-sky-900 text-sky-900 text-sm md:text-base font-medium hover:bg-slate-200"
-          >
-            Mouse
-          </Button>
+        <div className="flex flex-wrap gap-2">
+          {filters.map((filter) => (
+            <button
+              key={filter}
+              onClick={() => setActive(filter)}
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                active === filter
+                  ? 'bg-slate-900 text-white shadow-md'
+                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+              }`}
+            >
+              {filter}
+            </button>
+          ))}
         </div>
       </div>
-    </div>
+    </section>
   );
 };
 

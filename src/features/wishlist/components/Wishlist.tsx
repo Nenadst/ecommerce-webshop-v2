@@ -5,13 +5,11 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useQuery } from '@apollo/client';
 import { gql } from 'graphql-tag';
-import { Card } from '@/shared/components/elements/Card';
 import Star from '@/shared/components/elements/Star';
 import { HeartIconBig } from '@/shared/components/icons';
 import { useFavorites } from '@/shared/hooks/useFavorites';
 import { useCart } from '@/shared/contexts/CartContext';
 import Spinner from '@/shared/components/spinner/Spinner';
-import Button from '@/shared/components/elements/Button';
 import { useAuth } from '@/shared/contexts/AuthContext';
 import { useCartDrawer } from '@/shared/contexts/CartDrawerContext';
 import toast from 'react-hot-toast';
@@ -124,13 +122,10 @@ const Wishlist = () => {
   const handleToggleFavorite = async (e: React.MouseEvent, productId: string) => {
     e.preventDefault();
     e.stopPropagation();
-
     const current = hasLocalChanges ? localProducts : products;
     const updated = current.filter((p) => p.id !== productId);
-
     setLocalProducts(updated);
     setHasLocalChanges(true);
-
     await toggleFavorite(productId);
   };
 
@@ -144,7 +139,6 @@ const Wishlist = () => {
     }
 
     const selectedQty = getSelectedQuantity(product.id);
-
     if (selectedQty > product.quantity) {
       toast.error(`Only ${product.quantity} items available in stock`);
       return;
@@ -154,7 +148,6 @@ const Wishlist = () => {
     try {
       await addToCart(product.id, selectedQty);
       setQuantities((prev) => ({ ...prev, [product.id]: 1 }));
-
       openDrawer();
     } catch (error) {
       console.error('Failed to add to cart:', error);
@@ -165,16 +158,13 @@ const Wishlist = () => {
 
   const handleAddAllToCart = async () => {
     const inStockProducts = displayProducts.filter((p: Product) => p.quantity > 0);
-
     if (inStockProducts.length === 0) {
       toast.error('No products in stock to add');
       return;
     }
-
     setAddingToCart('all');
     let successCount = 0;
     let failCount = 0;
-
     for (const product of inStockProducts) {
       try {
         await addToCart(product.id, 1);
@@ -184,159 +174,150 @@ const Wishlist = () => {
         failCount++;
       }
     }
-
     setAddingToCart(null);
-
-    if (successCount > 0) {
-      openDrawer();
-    }
-    if (failCount > 0) {
+    if (successCount > 0) openDrawer();
+    if (failCount > 0)
       toast.error(`Failed to add ${failCount} ${failCount === 1 ? 'item' : 'items'}`);
-    }
-  };
-
-  const truncateText = (text: string, maxLength: number) => {
-    if (!text) return '';
-    return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
   };
 
   return (
-    <div className="bg-gradient-to-b from-sky-50 to-white min-h-screen">
-      <div className="bg-gradient-to-r from-sky-900 via-cyan-700 to-sky-900 text-white py-16">
-        <div className="container mx-auto px-4">
-          <div className="max-w-3xl mx-auto text-center">
-            <h1 className="text-5xl font-bold mb-4">My Wishlist</h1>
-            <p className="text-xl text-sky-100">
-              {displayProducts.length > 0
-                ? `You have ${displayProducts.length} ${displayProducts.length === 1 ? 'item' : 'items'} in your wishlist`
-                : 'Start adding your favorite products'}
-            </p>
+    <div className="bg-slate-50 min-h-screen">
+      {/* Page header */}
+      <div className="bg-white border-b border-slate-100">
+        <div className="container mx-auto px-4 lg:px-16 py-8">
+          <div className="flex items-center gap-2 text-slate-400 text-sm mb-3">
+            <Link href="/" className="hover:text-amber-500 transition-colors">
+              Home
+            </Link>
+            <span>›</span>
+            <span className="text-slate-700 font-medium">Wishlist</span>
           </div>
+          <h1 className="text-3xl font-bold text-slate-900">My Wishlist</h1>
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-12">
+      <div className="container mx-auto px-4 lg:px-16 py-10">
         {loading ? (
-          <div className="flex justify-center py-20">
+          <div className="flex justify-center py-24">
             <Spinner />
           </div>
         ) : displayProducts.length === 0 ? (
-          <div className="max-w-2xl mx-auto text-center py-16">
-            <div className="mb-8">
-              <div className="w-48 h-48 mx-auto bg-gradient-to-br from-sky-100 to-cyan-100 rounded-full flex items-center justify-center mb-6">
-                <HeartIconBig className="w-24 h-24 text-sky-400" />
-              </div>
-              <h2 className="text-3xl font-bold text-sky-900 mb-4">Your Wishlist is Empty</h2>
-              <p className="text-gray-600 text-lg mb-8">
-                Discover amazing products and add them to your wishlist by clicking the heart icon
-              </p>
+          /* Empty state */
+          <div className="max-w-md mx-auto text-center py-20">
+            <div className="w-24 h-24 mx-auto bg-slate-100 rounded-full flex items-center justify-center mb-6">
+              <HeartIconBig className="w-12 h-12 text-slate-300" />
             </div>
+            <h2 className="text-2xl font-bold text-slate-900 mb-2">Your wishlist is empty</h2>
+            <p className="text-slate-500 mb-8">
+              Save your favorite products here to keep track of them and add them to cart later.
+            </p>
             <Link href="/products">
-              <Button className="bg-amber-500 hover:bg-amber-600 text-white px-8 py-4 text-lg font-medium rounded-lg transition-colors shadow-lg hover:shadow-xl">
+              <button className="px-8 py-3 bg-amber-500 hover:bg-amber-400 text-white font-semibold rounded-2xl transition-colors shadow-lg shadow-amber-500/30">
                 Start Shopping
-              </Button>
+              </button>
             </Link>
           </div>
         ) : (
           <>
-            <div className="mb-8 bg-white rounded-lg shadow-md p-6">
-              <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-                <div className="grid grid-cols-3 gap-6 flex-1">
-                  <div className="text-center">
-                    <div className="text-3xl font-bold text-sky-900">{displayProducts.length}</div>
-                    <div className="text-gray-600">Total Items</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-3xl font-bold text-green-600">
-                      {displayProducts.filter((p) => p.quantity > 0).length}
-                    </div>
-                    <div className="text-gray-600">In Stock</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-3xl font-bold text-sky-900">
-                      €{displayProducts.reduce((sum, p) => sum + p.price, 0).toFixed(2)}
-                    </div>
-                    <div className="text-gray-600">Total Value</div>
-                  </div>
+            {/* Stats + actions bar */}
+            <div className="bg-white rounded-2xl border border-slate-100 p-5 mb-8 flex flex-col sm:flex-row items-center justify-between gap-5">
+              <div className="flex items-center gap-8">
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-slate-900">{displayProducts.length}</div>
+                  <div className="text-slate-400 text-xs font-medium mt-0.5">Total Items</div>
                 </div>
-                <Button
-                  onClick={handleAddAllToCart}
-                  disabled={
-                    addingToCart === 'all' ||
-                    displayProducts.filter((p) => p.quantity > 0).length === 0
-                  }
-                  className="bg-amber-500 hover:bg-amber-600 text-white px-6 py-3 text-base font-medium rounded-lg transition-colors shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
-                >
-                  {addingToCart === 'all' ? 'Adding All...' : 'Add All to Cart'}
-                </Button>
+                <div className="w-px h-10 bg-slate-100" />
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-green-500">
+                    {displayProducts.filter((p) => p.quantity > 0).length}
+                  </div>
+                  <div className="text-slate-400 text-xs font-medium mt-0.5">In Stock</div>
+                </div>
+                <div className="w-px h-10 bg-slate-100" />
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-slate-900">
+                    €{displayProducts.reduce((sum, p) => sum + p.price, 0).toFixed(2)}
+                  </div>
+                  <div className="text-slate-400 text-xs font-medium mt-0.5">Total Value</div>
+                </div>
               </div>
+              <button
+                onClick={handleAddAllToCart}
+                disabled={
+                  addingToCart === 'all' ||
+                  displayProducts.filter((p) => p.quantity > 0).length === 0
+                }
+                className="px-6 py-3 bg-amber-500 hover:bg-amber-400 text-white font-semibold rounded-2xl transition-colors shadow-lg shadow-amber-500/30 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap text-sm"
+              >
+                {addingToCart === 'all' ? 'Adding All...' : 'Add All to Cart'}
+              </button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {/* Product grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
               {displayProducts.map((product: Product, index: number) => (
                 <Link href={`/products/${product.id}`} key={product.id}>
-                  <Card className="w-full h-[500px] flex flex-col overflow-hidden cursor-pointer shadow-[0_0_15px_rgba(0,0,0,0.1)] hover:shadow-[0_0_25px_rgba(0,0,0,0.15)] transition-all duration-300 group border-2 border-transparent hover:border-amber-500">
-                    <div className="relative h-64 bg-gradient-to-br from-gray-50 to-sky-50 flex items-center justify-center overflow-hidden">
+                  <div className="group bg-white border border-slate-100 rounded-2xl overflow-hidden hover:shadow-xl hover:border-amber-200 transition-all duration-300 cursor-pointer flex flex-col">
+                    {/* Image area */}
+                    <div className="relative h-52 bg-slate-50 flex items-center justify-center overflow-hidden">
                       <Image
                         src={product.images?.[0] || '/assets/img/no-product.png'}
                         alt={product.name}
                         width={256}
                         height={256}
-                        className="object-contain w-full h-full p-4 group-hover:scale-110 transition-transform duration-300"
+                        className="object-contain w-full h-full p-5 group-hover:scale-105 transition-transform duration-300"
                         priority={index < 4}
                       />
+                      {/* Remove from wishlist */}
                       <button
                         onClick={(e) => handleToggleFavorite(e, product.id)}
-                        className="absolute top-3 right-3 w-10 h-10 bg-white rounded-full flex items-center justify-center hover:bg-red-50 transition-colors shadow-lg z-10"
-                        aria-label="Remove from favorites"
+                        className="absolute top-3 right-3 w-9 h-9 bg-white rounded-full flex items-center justify-center shadow-md hover:bg-red-50 transition-colors z-10"
+                        aria-label="Remove from wishlist"
                       >
-                        <HeartIconBig className="w-5 h-5 fill-red-500 text-red-500 transition-colors" />
+                        <HeartIconBig className="w-4 h-4 fill-red-500 text-red-500" />
                       </button>
-                      <span className="absolute top-3 left-3 bg-sky-900 text-white text-xs font-medium px-3 py-1 rounded-full shadow-md">
+                      {/* Category badge */}
+                      <span className="absolute top-3 left-3 bg-slate-900/80 backdrop-blur-sm text-white text-xs font-medium px-2.5 py-1 rounded-full">
                         {product.category.name}
                       </span>
+                      {/* Stock badge */}
                       {product.quantity > 0 ? (
-                        <span className="absolute bottom-3 left-3 bg-green-500 text-white text-xs font-medium px-3 py-1 rounded-full shadow-md">
+                        <span className="absolute bottom-3 left-3 bg-green-500 text-white text-xs font-medium px-2.5 py-1 rounded-full">
                           In Stock
                         </span>
                       ) : (
-                        <span className="absolute bottom-3 left-3 bg-red-500 text-white text-xs font-medium px-3 py-1 rounded-full shadow-md">
+                        <span className="absolute bottom-3 left-3 bg-red-500 text-white text-xs font-medium px-2.5 py-1 rounded-full">
                           Out of Stock
                         </span>
                       )}
                     </div>
-                    <div className="p-4 flex flex-col flex-grow bg-white">
-                      <h3 className="text-sky-900 text-lg font-semibold mb-2 line-clamp-1">
+
+                    {/* Info area */}
+                    <div className="p-4 flex flex-col flex-1">
+                      <h3 className="text-slate-900 font-semibold text-sm mb-1 line-clamp-1 group-hover:text-amber-500 transition-colors">
                         {product.name}
                       </h3>
-                      <p className="text-gray-600 text-sm mb-3 line-clamp-2">
-                        {product.description
-                          ? truncateText(product.description, 80)
-                          : 'No description available'}
-                      </p>
-                      <div className="flex items-center justify-between mb-2 mt-auto">
-                        <div className="flex flex-col">
-                          <span className="text-2xl font-bold text-sky-900">€{product.price}</span>
-                        </div>
+                      <div className="mb-2">
                         <Star count={5} />
                       </div>
-                      {getCartQuantity(product.id) > 0 && (
-                        <div className="mb-2 px-3 py-1.5 bg-sky-50 border border-sky-200 rounded-lg flex items-center justify-between">
-                          <span className="text-sm text-sky-900 font-medium">In Cart:</span>
-                          <span className="text-sm font-bold text-sky-900">
-                            {getCartQuantity(product.id)}{' '}
-                            {getCartQuantity(product.id) === 1 ? 'item' : 'items'}
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="text-slate-900 text-xl font-bold">€{product.price}</span>
+                        {getCartQuantity(product.id) > 0 && (
+                          <span className="text-xs text-amber-500 font-semibold bg-amber-50 px-2 py-1 rounded-full">
+                            {getCartQuantity(product.id)} in cart
                           </span>
-                        </div>
-                      )}
+                        )}
+                      </div>
+
+                      {/* Quantity selector */}
                       <div
                         onClick={(e) => {
                           e.preventDefault();
                           e.stopPropagation();
                         }}
-                        className="mb-2 flex items-center justify-between px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg"
+                        className="flex items-center justify-between px-3 py-2 bg-slate-50 border border-slate-100 rounded-xl mb-3"
                       >
-                        <span className="text-sm text-gray-700 font-medium">Quantity:</span>
+                        <span className="text-slate-500 text-xs font-medium">Qty</span>
                         <div className="flex items-center gap-2">
                           <button
                             onClick={(e) => {
@@ -347,10 +328,10 @@ const Wishlist = () => {
                             disabled={
                               product.quantity === 0 || getSelectedQuantity(product.id) <= 1
                             }
-                            className="w-7 h-7 flex items-center justify-center rounded-md bg-white border border-gray-300 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                            className="w-6 h-6 flex items-center justify-center rounded-lg bg-white border border-slate-200 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                           >
                             <svg
-                              className="w-4 h-4 text-gray-600"
+                              className="w-3 h-3 text-slate-600"
                               fill="none"
                               stroke="currentColor"
                               viewBox="0 0 24 24"
@@ -363,7 +344,7 @@ const Wishlist = () => {
                               />
                             </svg>
                           </button>
-                          <span className="w-10 text-center font-bold text-gray-900">
+                          <span className="w-8 text-center font-bold text-slate-900 text-sm">
                             {product.quantity === 0 ? 0 : getSelectedQuantity(product.id)}
                           </span>
                           <button
@@ -376,10 +357,10 @@ const Wishlist = () => {
                               product.quantity === 0 ||
                               getSelectedQuantity(product.id) >= product.quantity
                             }
-                            className="w-7 h-7 flex items-center justify-center rounded-md bg-white border border-gray-300 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                            className="w-6 h-6 flex items-center justify-center rounded-lg bg-white border border-slate-200 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                           >
                             <svg
-                              className="w-4 h-4 text-gray-600"
+                              className="w-3 h-3 text-slate-600"
                               fill="none"
                               stroke="currentColor"
                               viewBox="0 0 24 24"
@@ -394,13 +375,15 @@ const Wishlist = () => {
                           </button>
                         </div>
                       </div>
-                      <Button
+
+                      {/* Add to cart button */}
+                      <button
                         onClick={(e) => e && handleAddToCart(e, product)}
                         disabled={product.quantity === 0 || addingToCart === product.id}
-                        className={`w-full py-2.5 text-sm font-medium rounded-lg transition-all duration-300 ${
+                        className={`w-full py-2.5 text-sm font-semibold rounded-xl transition-all duration-200 mt-auto ${
                           product.quantity > 0
-                            ? 'bg-amber-500 hover:bg-amber-600 text-white shadow-md hover:shadow-lg'
-                            : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                            ? 'bg-amber-500 hover:bg-amber-400 text-white shadow-sm shadow-amber-500/30'
+                            : 'bg-slate-100 text-slate-400 cursor-not-allowed'
                         } disabled:opacity-50`}
                       >
                         {addingToCart === product.id
@@ -408,22 +391,24 @@ const Wishlist = () => {
                           : product.quantity > 0
                             ? 'Add to Cart'
                             : 'Out of Stock'}
-                      </Button>
+                      </button>
                     </div>
-                  </Card>
+                  </div>
                 </Link>
               ))}
             </div>
 
-            <div className="mt-12 text-center bg-gradient-to-r from-sky-900 to-cyan-700 rounded-lg p-8 text-white shadow-xl">
-              <h3 className="text-2xl font-bold mb-3">Ready to shop?</h3>
-              <p className="text-sky-100 mb-6">
-                Add these items to your cart and complete your purchase
+            {/* Bottom CTA */}
+            <div className="mt-12 bg-slate-900 rounded-3xl p-8 md:p-10 text-center relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+              <h3 className="text-white text-2xl font-bold mb-2 relative z-10">Ready to shop?</h3>
+              <p className="text-slate-400 mb-6 relative z-10">
+                Add these items to your cart and complete your purchase.
               </p>
               <Link href="/products">
-                <Button className="bg-amber-500 hover:bg-amber-600 text-white px-8 py-3 text-lg font-medium rounded-lg transition-colors shadow-lg hover:shadow-xl">
+                <button className="px-8 py-3 bg-amber-500 hover:bg-amber-400 text-white font-semibold rounded-full transition-colors shadow-lg shadow-amber-500/30 relative z-10">
                   Continue Shopping
-                </Button>
+                </button>
               </Link>
             </div>
           </>

@@ -1,41 +1,120 @@
 import React from 'react';
+import Link from 'next/link';
+
+const categories = [
+  { name: 'Cameras', icon: '📷', desc: 'DSLR, mirrorless & action cameras', count: 'View All' },
+  { name: 'Laptops', icon: '💻', desc: 'Work, gaming & ultrabooks', count: 'View All' },
+  { name: 'Speakers', icon: '🔊', desc: 'Portable, home & studio audio', count: 'View All' },
+  { name: 'Smartphones', icon: '📱', desc: 'Android, iOS & accessories', count: 'View All' },
+  { name: 'Accessories', icon: '🎧', desc: 'Cables, cases & peripherals', count: 'View All' },
+  { name: 'Wearables', icon: '⌚', desc: 'Smartwatches & fitness trackers', count: 'View All' },
+];
 
 const CatalogPage = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-sky-50 to-white">
-      <div className="bg-gradient-to-r from-sky-900 via-cyan-700 to-sky-900 text-white py-16">
-        <div className="container mx-auto px-4">
-          <div className="max-w-3xl mx-auto text-center">
-            <h1 className="text-5xl font-bold mb-4">Catalog</h1>
-            <p className="text-xl text-sky-100">Browse our comprehensive catalog</p>
-          </div>
+    <div className="bg-slate-50 min-h-screen">
+      {/* Hero */}
+      <div className="bg-slate-900 relative overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-0 left-1/3 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl" />
+          <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-amber-400/5 rounded-full blur-3xl" />
+        </div>
+        <div className="container mx-auto px-4 lg:px-16 py-20 relative text-center">
+          <p className="text-amber-400 text-sm font-semibold uppercase tracking-widest mb-3">
+            Catalog
+          </p>
+          <h1 className="text-white text-4xl md:text-5xl font-bold mb-4">
+            Browse by <span className="text-amber-400">Category</span>
+          </h1>
+          <p className="text-slate-400 text-lg max-w-xl mx-auto">
+            Explore our full range of premium electronics, organized by category to help you find
+            exactly what you need.
+          </p>
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-20">
-        <div className="max-w-2xl mx-auto text-center">
-          <div className="mb-8">
-            <div className="w-48 h-48 mx-auto bg-gradient-to-br from-sky-100 to-cyan-100 rounded-full flex items-center justify-center mb-6">
-              <svg
-                className="w-24 h-24 text-sky-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
+      <div className="container mx-auto px-4 lg:px-16 py-12">
+        {/* Coming soon notice */}
+        <div className="bg-amber-50 border border-amber-200 rounded-2xl p-5 flex items-start gap-4 mb-10">
+          <div className="w-10 h-10 bg-amber-500/15 rounded-xl flex items-center justify-center flex-shrink-0">
+            <svg
+              className="w-5 h-5 text-amber-500"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+          </div>
+          <div>
+            <p className="text-amber-800 font-semibold text-sm">Full Catalog Coming Soon</p>
+            <p className="text-amber-700 text-sm mt-0.5">
+              We&apos;re building a comprehensive catalog experience. In the meantime, browse all
+              products on our{' '}
+              <Link
+                href="/products"
+                className="underline font-semibold hover:text-amber-900 transition-colors"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-                />
-              </svg>
-            </div>
-            <h2 className="text-4xl font-bold text-sky-900 mb-4">Coming Soon</h2>
-            <p className="text-gray-600 text-lg mb-8">
-              We&apos;re building an amazing catalog experience for you. Stay tuned for our complete
-              product catalog!
+                Products page
+              </Link>
+              .
             </p>
           </div>
+        </div>
+
+        {/* Category cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          {categories.map((cat) => (
+            <Link key={cat.name} href="/products">
+              <div className="bg-white rounded-2xl border border-slate-100 p-6 hover:shadow-md hover:border-amber-200 transition-all group cursor-pointer">
+                <div className="text-4xl mb-4">{cat.icon}</div>
+                <h3 className="text-slate-900 font-bold text-lg mb-1 group-hover:text-amber-600 transition-colors">
+                  {cat.name}
+                </h3>
+                <p className="text-slate-500 text-sm mb-4">{cat.desc}</p>
+                <span className="inline-flex items-center gap-1.5 text-amber-500 text-sm font-semibold">
+                  {cat.count}
+                  <svg
+                    className="w-4 h-4 group-hover:translate-x-1 transition-transform"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M17 8l4 4m0 0l-4 4m4-4H3"
+                    />
+                  </svg>
+                </span>
+              </div>
+            </Link>
+          ))}
+        </div>
+
+        {/* CTA */}
+        <div className="mt-10 text-center">
+          <Link
+            href="/products"
+            className="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-400 text-white font-semibold px-8 py-3.5 rounded-xl transition-colors shadow-md shadow-amber-500/30"
+          >
+            View All Products
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+            </svg>
+          </Link>
         </div>
       </div>
     </div>

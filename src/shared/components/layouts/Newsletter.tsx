@@ -1,34 +1,68 @@
-import InputField from '@/shared/components/elements/InputField';
-import React from 'react';
-import { HeadphonesIcon, MessageSendIcon } from '../icons';
+'use client';
+
+import React, { useState } from 'react';
+import { HeadphonesIcon } from '../icons';
 
 const Newsletter = () => {
+  const [email, setEmail] = useState('');
+
   return (
-    <div className="container mx-auto px-4">
-      <div className="flex pt-6 md:pt-10 pb-4">
-        <div className="w-full lg:w-[90%] min-h-36 bg-white rounded-2xl justify-center items-center gap-4 md:gap-6 lg:gap-32 flex flex-col md:flex-row m-auto p-4 md:p-6">
-          <div className="text-cyan-800 text-lg md:text-xl lg:text-2xl font-bold text-center md:text-left">
-            Subscribe newsletter
+    <div className="border-b border-slate-800">
+      <div className="container mx-auto px-4 lg:px-16 py-12 md:py-16">
+        <div className="flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-16">
+          {/* Left — headline */}
+          <div className="text-center lg:text-left flex-shrink-0">
+            <p className="text-amber-400 text-sm font-semibold uppercase tracking-widest mb-2">
+              Newsletter
+            </p>
+            <h2 className="text-white text-2xl md:text-3xl font-bold mb-1">Stay in the Loop</h2>
+            <p className="text-slate-400 text-sm">
+              Get exclusive deals and the latest updates delivered to your inbox.
+            </p>
           </div>
-          <div className="justify-center items-center gap-4 md:gap-8 lg:gap-20 flex flex-col sm:flex-row w-full md:w-auto">
-            <div className="relative w-full sm:w-auto">
-              <InputField
-                type="text"
-                className="w-full sm:w-72 md:w-80 lg:w-96 h-12 md:h-14 pl-4 md:pl-6 pr-12 md:pr-16 bg-amber-500 rounded-2xl p-4 md:p-5 flex text-white placeholder:text-white focus:outline-none focus:border-white text-sm md:text-base"
-                placeholder="Email address"
+
+          {/* Center — email input */}
+          <div className="flex-1 w-full max-w-lg">
+            <div className="relative flex items-center h-12 bg-slate-800 rounded-2xl border border-slate-700 focus-within:border-amber-500 focus-within:ring-1 focus-within:ring-amber-500 transition-all">
+              <svg
+                width="20"
+                height="20"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                />
+              </svg>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter your email address"
+                className="w-full h-full pl-11 pr-2 bg-transparent text-white placeholder-slate-500 text-sm focus:outline-none rounded-2xl"
               />
-              <MessageSendIcon />
+              <div className="flex items-center pr-1.5 flex-shrink-0">
+                <button className="px-5 h-9 bg-amber-500 hover:bg-amber-400 text-white text-sm font-semibold rounded-xl transition-colors shadow-sm shadow-amber-500/30">
+                  Subscribe
+                </button>
+              </div>
             </div>
-            <div className="justify-center items-center gap-3 md:gap-5 flex">
-              <div className="w-9 h-9 md:w-11 md:h-11 justify-center items-center flex flex-shrink-0">
-                <div className="w-9 h-9 md:w-11 md:h-11 relative">
-                  <HeadphonesIcon />
-                </div>
-              </div>
-              <div className="text-zinc-600 text-xs md:text-sm font-semibold text-center sm:text-left">
-                Call us 24/7 :<br />
-                (+62) 0123 567 789
-              </div>
+            <p className="text-slate-500 text-xs mt-2 pl-1">No spam, unsubscribe at any time.</p>
+          </div>
+
+          {/* Right — phone */}
+          <div className="flex items-center gap-4 flex-shrink-0">
+            <div className="w-12 h-12 bg-amber-500/15 rounded-xl flex items-center justify-center border border-amber-500/25 flex-shrink-0 overflow-hidden">
+              <HeadphonesIcon />
+            </div>
+            <div>
+              <div className="text-slate-400 text-xs mb-0.5">Call us 24/7</div>
+              <div className="text-white text-base font-semibold">(+62) 0123 567 789</div>
             </div>
           </div>
         </div>

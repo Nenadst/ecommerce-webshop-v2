@@ -29,9 +29,7 @@ function SuccessContent() {
 
         if (data.orderNumber) {
           setOrderNumber(data.orderNumber);
-
           localStorage.removeItem('guest_cart');
-
           window.dispatchEvent(new Event('storage'));
           window.dispatchEvent(new Event('cart-cleared'));
         } else {
@@ -49,72 +47,77 @@ function SuccessContent() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="bg-slate-50 min-h-screen flex items-center justify-center">
         <Spinner />
       </div>
     );
   }
 
   return (
-    <div className="bg-gradient-to-b from-sky-50 to-white min-h-screen">
-      <div className="bg-gradient-to-r from-sky-900 via-cyan-700 to-sky-900 text-white py-16">
-        <div className="container mx-auto px-4">
-          <div className="max-w-3xl mx-auto text-center">
-            <h1 className="text-5xl font-bold mb-4">Order Confirmed!</h1>
-          </div>
+    <div className="bg-slate-50 min-h-screen flex items-center justify-center px-4">
+      <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-12 max-w-md w-full text-center">
+        {/* Success icon */}
+        <div className="w-20 h-20 mx-auto bg-green-50 rounded-2xl flex items-center justify-center mb-6 border border-green-100">
+          <svg
+            className="w-9 h-9 text-green-500"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+          </svg>
         </div>
-      </div>
 
-      <div className="container mx-auto px-4 py-12">
-        <div className="max-w-2xl mx-auto text-center">
-          <div className="mb-8">
-            <div className="w-24 h-24 mx-auto bg-green-100 rounded-full flex items-center justify-center mb-6">
-              <svg
-                className="w-12 h-12 text-green-600"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M5 13l4 4L19 7"
-                />
-              </svg>
-            </div>
-            <h2 className="text-3xl font-bold text-sky-900 mb-4">Thank You for Your Order!</h2>
-            {orderNumber && (
-              <p className="text-gray-600 text-lg mb-4">
-                Order Number: <span className="font-bold text-sky-900">#{orderNumber}</span>
-              </p>
-            )}
-            <p className="text-gray-600 text-lg mb-8">
-              Your payment has been processed successfully. You will receive an email confirmation
-              shortly.
-            </p>
+        <p className="text-green-500 text-sm font-semibold uppercase tracking-widest mb-2">
+          Order Confirmed
+        </p>
+        <h1 className="text-slate-900 text-2xl font-bold mb-3">Thank You for Your Order!</h1>
+
+        {orderNumber && (
+          <div className="bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 mb-4 inline-block">
+            <span className="text-slate-500 text-sm">Order Number: </span>
+            <span className="text-slate-900 font-bold text-sm">#{orderNumber}</span>
           </div>
+        )}
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            {isAuthenticated ? (
-              <Link href="/profile?tab=orders">
-                <Button className="bg-sky-900 hover:bg-sky-800 text-white px-8 py-4 text-lg font-medium rounded-lg transition-colors shadow-lg hover:shadow-xl">
-                  View My Orders
-                </Button>
-              </Link>
-            ) : orderNumber ? (
-              <Link href={`/order-confirmation?orderNumber=${orderNumber}`}>
-                <Button className="bg-sky-900 hover:bg-sky-800 text-white px-8 py-4 text-lg font-medium rounded-lg transition-colors shadow-lg hover:shadow-xl">
-                  View Order Details
-                </Button>
-              </Link>
-            ) : null}
-            <Link href="/products">
-              <Button className="bg-amber-500 hover:bg-amber-600 text-white px-8 py-4 text-lg font-medium rounded-lg transition-colors shadow-lg hover:shadow-xl">
-                Continue Shopping
+        <p className="text-slate-500 text-sm leading-relaxed mb-8">
+          Your payment has been processed successfully. You will receive an email confirmation
+          shortly with your order details.
+        </p>
+
+        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+          {isAuthenticated ? (
+            <Link href="/profile?tab=orders">
+              <Button className="w-full sm:w-auto bg-slate-900 hover:bg-slate-800 text-white px-6 py-2.5 text-sm font-semibold rounded-xl transition-colors shadow-sm">
+                View My Orders
               </Button>
             </Link>
-          </div>
+          ) : orderNumber ? (
+            <Link href={`/order-confirmation?orderNumber=${orderNumber}`}>
+              <Button className="w-full sm:w-auto bg-slate-900 hover:bg-slate-800 text-white px-6 py-2.5 text-sm font-semibold rounded-xl transition-colors shadow-sm">
+                View Order Details
+              </Button>
+            </Link>
+          ) : null}
+          <Link href="/products">
+            <Button className="w-full sm:w-auto bg-amber-500 hover:bg-amber-400 text-white px-6 py-2.5 text-sm font-semibold rounded-xl transition-colors shadow-sm shadow-amber-500/30">
+              Continue Shopping
+            </Button>
+          </Link>
+        </div>
+
+        {/* Trust badges */}
+        <div className="mt-8 pt-6 border-t border-slate-100 grid grid-cols-3 gap-3">
+          {[
+            { icon: '🔒', label: 'Secure Payment' },
+            { icon: '📦', label: 'Fast Shipping' },
+            { icon: '↩️', label: 'Easy Returns' },
+          ].map((badge) => (
+            <div key={badge.label} className="text-center">
+              <div className="text-xl mb-1">{badge.icon}</div>
+              <div className="text-xs text-slate-400 font-medium">{badge.label}</div>
+            </div>
+          ))}
         </div>
       </div>
     </div>
@@ -123,7 +126,13 @@ function SuccessContent() {
 
 export default function SuccessPage() {
   return (
-    <Suspense fallback={<Spinner />}>
+    <Suspense
+      fallback={
+        <div className="bg-slate-50 min-h-screen flex items-center justify-center">
+          <Spinner />
+        </div>
+      }
+    >
       <SuccessContent />
     </Suspense>
   );

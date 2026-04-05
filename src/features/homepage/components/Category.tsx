@@ -1,67 +1,65 @@
-import { Card } from '@/shared/components/elements/Card';
-import { ArrowLeftIcon, ArrowRightIcon } from '@/shared/components/icons';
 import Link from 'next/link';
 import React from 'react';
 
+const categories = [
+  {
+    name: 'Speakers',
+    count: 6,
+    image: '/assets/img/2-1.png',
+    bg: 'bg-sky-50',
+    accent: 'text-sky-600',
+  },
+  {
+    name: 'Laptops',
+    count: 12,
+    image: '/assets/img/5-1.png',
+    bg: 'bg-slate-50',
+    accent: 'text-slate-600',
+  },
+  {
+    name: 'Cameras',
+    count: 8,
+    image: '/assets/img/8-1.png',
+    bg: 'bg-amber-50',
+    accent: 'text-amber-600',
+  },
+];
+
 const Category = () => {
   return (
-    <div className="container mx-auto px-4">
-      <div className="flex flex-wrap pt-10 justify-center items-center">
-        <div className="flex flex-col lg:flex-row gap-4 md:gap-6 lg:gap-8 w-full lg:w-auto">
-          <Link href="/products" className="w-full lg:w-auto">
-            <Card className="w-full lg:w-96 h-36 justify-center items-center gap-6 md:gap-11 relative cursor-pointer transition ease-in-out hover:-translate-y-1 hover:scale-105 flex">
-              <div className="hidden lg:flex w-9 h-9 bg-gray-200 rounded-full cursor-pointer absolute -left-5 hover:bg-amber-400">
-                <div className="m-auto">
-                  <div className="w-6 h-6">
-                    <ArrowLeftIcon />
-                  </div>
-                </div>
-              </div>
-              <img className="rounded-lg w-24 md:w-28" src="/assets/img/2-1.png" alt="Speaker" />
-              <div className="flex-col justify-center items-start gap-2.5 inline-flex">
-                <div className="text-cyan-800 text-xl md:text-2xl font-semibold">Speaker</div>
-                <div className="text-cyan-800 text-base md:text-lg font-medium">(6 items)</div>
-              </div>
-            </Card>
-          </Link>
-          <Link href="/products" className="w-full lg:w-auto">
-            <Card className="w-full lg:w-96 h-36 justify-center items-center gap-6 md:gap-11 cursor-pointer transition ease-in-out hover:-translate-y-1 hover:scale-105 flex">
-              <img
-                className="w-24 md:w-32 h-24 md:h-28 rounded-lg"
-                src="/assets/img/5-1.png"
-                alt="Desktop & laptop"
-              />
-              <div className="flex-col justify-center items-start gap-2.5 inline-flex">
-                <div className="text-cyan-800 text-lg md:text-xl font-semibold">
-                  Desktop & laptop
-                </div>
-                <div className="text-cyan-800 text-base md:text-lg font-medium">(6 items)</div>
-              </div>
-            </Card>
-          </Link>
-          <Link href="/products" className="w-full lg:w-auto">
-            <Card className="w-full lg:w-96 h-36 justify-center items-center gap-6 md:gap-11 relative cursor-pointer transition ease-in-out hover:-translate-y-1 hover:scale-105 flex">
-              <img
-                className="w-24 md:w-28 h-24 md:h-28 rounded-lg"
-                src="/assets/img/8-1.png"
-                alt="DSLR camera"
-              />
-              <div className="flex-col justify-center items-start gap-2.5 inline-flex">
-                <div className="text-cyan-800 text-xl md:text-2xl font-semibold">DSLR camera</div>
-                <div className="text-cyan-800 text-base md:text-lg font-medium">(6 items)</div>
-              </div>
-              <div className="hidden lg:flex w-9 h-9 bg-gray-200 rounded-full cursor-pointer absolute -right-5 hover:bg-amber-400">
-                <div className="m-auto">
-                  <div className="w-6 h-6">
-                    <ArrowRightIcon />
-                  </div>
-                </div>
-              </div>
-            </Card>
-          </Link>
-        </div>
+    <section className="container mx-auto px-4 py-8">
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-slate-900 text-2xl md:text-3xl font-bold">Shop by Category</h2>
+        <Link
+          href="/products"
+          className="text-amber-500 text-sm font-semibold hover:text-amber-600 transition-colors"
+        >
+          View all →
+        </Link>
       </div>
-    </div>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6">
+        {categories.map((cat) => (
+          <Link href="/products" key={cat.name}>
+            <div
+              className={`${cat.bg} rounded-2xl p-6 flex items-center gap-5 cursor-pointer group hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border border-transparent hover:border-slate-100`}
+            >
+              <div className="w-20 h-20 rounded-xl overflow-hidden flex-shrink-0 bg-white shadow-sm flex items-center justify-center">
+                <img src={cat.image} alt={cat.name} className="w-16 h-16 object-contain" />
+              </div>
+              <div>
+                <h3 className="text-slate-800 text-lg font-bold group-hover:text-amber-500 transition-colors">
+                  {cat.name}
+                </h3>
+                <p className={`${cat.accent} text-sm font-medium`}>{cat.count} products</p>
+                <div className="mt-2 text-amber-500 text-sm font-semibold flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                  Explore <span>→</span>
+                </div>
+              </div>
+            </div>
+          </Link>
+        ))}
+      </div>
+    </section>
   );
 };
 

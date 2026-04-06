@@ -63,6 +63,19 @@ const ProductDetails = () => {
     }
   }, [availableQuantity, selectedQuantity]);
 
+  React.useEffect(() => {
+    if (!isFullscreen) return;
+    const imagesLength = product?.images?.length || 0 || 1;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowRight') setSelectedImageIndex((p) => (p + 1) % imagesLength);
+      else if (e.key === 'ArrowLeft')
+        setSelectedImageIndex((p) => (p - 1 + imagesLength) % imagesLength);
+      else if (e.key === 'Escape') setIsFullscreen(false);
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isFullscreen, product?.images?.length]);
+
   if (loading) {
     return (
       <div className="bg-slate-50 min-h-screen">

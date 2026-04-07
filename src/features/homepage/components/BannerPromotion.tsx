@@ -1,7 +1,11 @@
-import Link from 'next/link';
+'use client';
+
+import { Link } from '@/i18n/navigation';
 import React from 'react';
+import { useTranslations } from 'next-intl';
 
 const BannerPromotion = () => {
+  const t = useTranslations('homepage');
   return (
     <section className="container mx-auto px-4 py-6">
       <div className="relative bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 rounded-3xl overflow-hidden min-h-[260px] md:min-h-[320px] flex items-center">
@@ -13,17 +17,15 @@ const BannerPromotion = () => {
           {/* Text content */}
           <div className="flex-1 text-center md:text-left">
             <div className="inline-flex items-center gap-2 bg-amber-500/20 text-amber-400 text-xs font-semibold px-3 py-1.5 rounded-full mb-5 border border-amber-500/30">
-              ⚡ LIMITED TIME OFFER
+              ⚡ {t('bannerBadge')}
             </div>
             <h2 className="text-white text-3xl md:text-4xl lg:text-5xl font-bold mb-3 leading-tight">
-              Sale Up to <span className="text-amber-400">50% Off</span>
+              {t('bannerTitle')} <span className="text-amber-400">{t('bannerOff')}</span>
             </h2>
-            <p className="text-slate-400 text-base md:text-lg mb-7">
-              Latest laptops with 12-inch HD display. Don&apos;t miss this incredible deal!
-            </p>
+            <p className="text-slate-400 text-base md:text-lg mb-7">{t('bannerDesc')}</p>
             <Link href="/products">
               <button className="px-8 py-3 bg-amber-500 text-white font-semibold rounded-full hover:bg-amber-400 transition-colors shadow-lg shadow-amber-500/30">
-                Shop the Sale →
+                {t('shopTheSale')}
               </button>
             </Link>
           </div>

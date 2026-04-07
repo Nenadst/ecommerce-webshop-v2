@@ -1,18 +1,20 @@
 'use client';
 
-import Link from 'next/link';
+import { Link } from '@/i18n/navigation';
 import React, { useState } from 'react';
 import { CategoriesDropdown } from '../navigation/CategoriesDropdown';
-
-const navLinks = [
-  { href: '/', label: 'Home' },
-  { href: '/catalog', label: 'Catalog' },
-  { href: '/blog', label: 'Blog' },
-  { href: '/about-us', label: 'About Us' },
-];
+import { useTranslations } from 'next-intl';
 
 const Navigation = () => {
+  const t = useTranslations('navigation');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const navLinks = [
+    { href: '/', label: t('home') },
+    { href: '/catalog', label: t('catalog') },
+    { href: '/blog', label: t('blog') },
+    { href: '/about-us', label: t('aboutUs') },
+  ];
 
   return (
     <>
@@ -60,7 +62,7 @@ const Navigation = () => {
           {/* 24/7 Support badge */}
           <div className="hidden lg:flex items-center gap-2 text-slate-500 text-sm font-medium">
             <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-            24/7 Support
+            {t('support')}
           </div>
         </div>
       </div>
@@ -87,7 +89,7 @@ const Navigation = () => {
                   d="M4 6h16M4 12h8m-8 6h16"
                 />
               </svg>
-              Browse Categories
+              {t('browseCategories')}
             </Link>
             {navLinks.map((link) => (
               <Link
@@ -101,7 +103,7 @@ const Navigation = () => {
             ))}
             <div className="flex items-center gap-2 px-6 py-4 text-slate-500 text-sm font-medium">
               <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-              24/7 Support
+              {t('support')}
             </div>
           </div>
         </div>

@@ -7,6 +7,13 @@ import orderResolvers from '../../entities/order/api/order.resolver';
 import activityResolvers from '../../entities/activity/api/activity.resolver';
 
 export const typeDefs = gql`
+  type ProductTranslation {
+    id: ID!
+    locale: String!
+    name: String!
+    description: String
+  }
+
   type Product {
     id: ID!
     name: String!
@@ -17,6 +24,7 @@ export const typeDefs = gql`
     quantity: Int!
     images: [String!]!
     category: Category!
+    translations: [ProductTranslation!]!
   }
 
   type Category {
@@ -192,9 +200,16 @@ export const typeDefs = gql`
     items: [OrderItemInput!]
   }
 
-  input ProductInput {
+  input ProductTranslationInput {
+    locale: String!
     name: String!
     description: String
+  }
+
+  input ProductInput {
+    name: String
+    description: String
+    translations: [ProductTranslationInput!]
     price: Float!
     hasDiscount: Boolean
     discountPrice: Float
@@ -279,6 +294,9 @@ export const typeDefs = gql`
 `;
 
 export const resolvers = {
+  Product: {
+    ...productResolvers.Product,
+  },
   Query: {
     ...productResolvers.Query,
     ...categoryResolvers.Query,

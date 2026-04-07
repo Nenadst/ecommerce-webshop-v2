@@ -7,7 +7,7 @@ import SideCategories from './SideCategories';
 import SideAvaliability from './SideAvaliability';
 import Star from '@/shared/components/elements/Star';
 import BannerPromotion from '@/features/homepage/components/BannerPromotion';
-import Link from 'next/link';
+import { Link } from '@/i18n/navigation';
 import { useQuery } from '@apollo/client';
 import { GET_PRODUCTS } from '@/entities/product/api/product.queries';
 import { HeartIconBig } from '@/shared/components/icons';
@@ -18,6 +18,7 @@ import { useAuth } from '@/shared/contexts/AuthContext';
 import Button from '@/shared/components/elements/Button';
 import toast from 'react-hot-toast';
 import { AuthModal } from '@/shared/components/modals/AuthModal';
+import { useTranslations } from 'next-intl';
 
 interface Product {
   id: string;
@@ -37,6 +38,8 @@ interface ProductsProps {
 }
 
 const Products = ({ initialData }: ProductsProps) => {
+  const t = useTranslations('products');
+  const tDetail = useTranslations('productDetail');
   const searchParams = useSearchParams();
   const categoryFromUrl = searchParams.get('category');
 
@@ -150,12 +153,12 @@ const Products = ({ initialData }: ProductsProps) => {
     e.stopPropagation();
     const availableQty = getAvailableQuantity(product.id, product.quantity);
     if (availableQty === 0) {
-      toast.error('All available stock is already in your cart');
+      toast.error(tDetail('allStockInCart'));
       return;
     }
     const selectedQty = getSelectedQuantity(product.id);
     if (selectedQty > availableQty) {
-      toast.error(`Only ${availableQty} more item(s) can be added to cart`);
+      toast.error(tDetail('maxStock', { count: availableQty }));
       return;
     }
     setAddingToCart(product.id);
@@ -196,21 +199,20 @@ const Products = ({ initialData }: ProductsProps) => {
               {/* Toolbar */}
               <div className="flex items-center justify-between mb-6 bg-white rounded-2xl border border-slate-100 px-5 py-3.5">
                 <p className="text-slate-500 text-sm">
-                  Showing <span className="font-semibold text-slate-900">{products.length}</span> of{' '}
-                  <span className="font-semibold text-slate-900">{filteredTotal}</span> products
+                  {t('showing', { count: products.length, total: filteredTotal })}
                 </p>
                 <div className="flex items-center gap-3">
-                  <span className="text-slate-500 text-sm">Sort:</span>
+                  <span className="text-slate-500 text-sm">{t('sortLabel')}</span>
                   <select
                     onChange={handleSortChange}
                     className="text-sm border border-slate-200 rounded-xl px-3 py-2 bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 cursor-pointer"
                   >
-                    <option value="newest">Newest First</option>
-                    <option value="oldest">Oldest First</option>
-                    <option value="price-asc">Price: Low to High</option>
-                    <option value="price-desc">Price: High to Low</option>
-                    <option value="name-asc">Name: A to Z</option>
-                    <option value="name-desc">Name: Z to A</option>
+                    <option value="newest">{t('sortNewest')}</option>
+                    <option value="oldest">{t('sortNewest')}</option>
+                    <option value="price-asc">{t('sortPriceAsc')}</option>
+                    <option value="price-desc">{t('sortPriceDesc')}</option>
+                    <option value="name-asc">{t('sortNameAsc')}</option>
+                    <option value="name-desc">{t('sortNameDesc')}</option>
                   </select>
                 </div>
               </div>
@@ -230,8 +232,8 @@ const Products = ({ initialData }: ProductsProps) => {
                   {products.length === 0 ? (
                     <div className="col-span-full text-center py-24">
                       <div className="text-slate-300 text-6xl mb-4">🔍</div>
-                      <p className="text-slate-500 text-lg font-medium">No products found</p>
-                      <p className="text-slate-400 text-sm mt-1">Try adjusting your filters</p>
+                      <p className="text-slate-500 text-lg font-medium">{t('noProductsFound')}</p>
+                      <p className="text-slate-400 text-sm mt-1">{t('adjustFilters')}</p>
                     </div>
                   ) : (
                     products.map((product: Product, index: number) => {
@@ -256,15 +258,15 @@ const Products = ({ initialData }: ProductsProps) => {
                               {/* Stock badge */}
                               {availableQty > 0 ? (
                                 <span className="absolute bottom-3 left-3 bg-green-500 text-white text-xs font-medium px-2.5 py-1 rounded-full">
-                                  In Stock
+                                  {t('inStock')}
                                 </span>
                               ) : product.quantity > 0 ? (
                                 <span className="absolute bottom-3 left-3 bg-orange-500 text-white text-xs font-medium px-2.5 py-1 rounded-full">
-                                  All in Cart
+                                  {t('allInCart')}
                                 </span>
                               ) : (
                                 <span className="absolute bottom-3 left-3 bg-red-500 text-white text-xs font-medium px-2.5 py-1 rounded-full">
-                                  Out of Stock
+                                  {t('outOfStock')}
                                 </span>
                               )}
                               {/* Wishlist */}
@@ -273,8 +275,8 @@ const Products = ({ initialData }: ProductsProps) => {
                                 className="absolute top-3 right-3 w-8 h-8 bg-white rounded-full flex items-center justify-center hover:bg-amber-50 transition-colors shadow-sm z-10"
                                 aria-label={
                                   isFavorite(product.id)
-                                    ? 'Remove from favorites'
-                                    : 'Add to favorites'
+                                    ? t('removeFromFavorites')
+                                    : t('addToFavorites')
                                 }
                               >
                                 <HeartIconBig
@@ -293,7 +295,7 @@ const Products = ({ initialData }: ProductsProps) => {
                                 {product.name}
                               </h3>
                               <p className="text-slate-400 text-xs line-clamp-2 mb-3 flex-1">
-                                {product.description || 'No description available'}
+                                {product.description || t('noDescription')}
                               </p>
 
                               <div className="flex items-center justify-between mb-3">
@@ -311,7 +313,9 @@ const Products = ({ initialData }: ProductsProps) => {
                                   e.stopPropagation();
                                 }}
                               >
-                                <span className="text-xs text-slate-500 font-medium">Qty</span>
+                                <span className="text-xs text-slate-500 font-medium">
+                                  {t('qty')}
+                                </span>
                                 <div className="flex items-center gap-2">
                                   <button
                                     onClick={(e) => {
@@ -387,12 +391,12 @@ const Products = ({ initialData }: ProductsProps) => {
                                   } disabled:opacity-60`}
                                 >
                                   {addingToCart === product.id
-                                    ? 'Adding...'
+                                    ? t('adding')
                                     : availableQty > 0
-                                      ? 'Add to Cart'
+                                      ? t('addToCart')
                                       : product.quantity > 0
-                                        ? 'All in Cart'
-                                        : 'Out of Stock'}
+                                        ? t('allInCart')
+                                        : t('outOfStock')}
                                 </Button>
                               </div>
                             </div>
@@ -408,7 +412,7 @@ const Products = ({ initialData }: ProductsProps) => {
               {allProducts.length > 0 && totalPages > 0 && (
                 <div className="flex items-center justify-between mt-8 bg-white rounded-2xl border border-slate-100 px-5 py-3.5">
                   <div className="flex items-center gap-2">
-                    <span className="text-slate-500 text-sm">Show:</span>
+                    <span className="text-slate-500 text-sm">{t('perPage')}</span>
                     <select
                       value={productsPerPage}
                       onChange={(e) => {
@@ -430,7 +434,7 @@ const Products = ({ initialData }: ProductsProps) => {
                       disabled={currentPage === 1}
                       className="px-3 py-2 text-sm border border-slate-200 rounded-xl hover:border-amber-400 hover:text-amber-500 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
                     >
-                      ← Prev
+                      {t('previous')}
                     </button>
                     {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                       <button
@@ -450,7 +454,7 @@ const Products = ({ initialData }: ProductsProps) => {
                       disabled={currentPage === totalPages}
                       className="px-3 py-2 text-sm border border-slate-200 rounded-xl hover:border-amber-400 hover:text-amber-500 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
                     >
-                      Next →
+                      {t('next')}
                     </button>
                   </div>
                 </div>

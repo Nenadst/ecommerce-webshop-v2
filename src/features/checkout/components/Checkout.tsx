@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
+import { Link } from '@/i18n/navigation';
 import { useCart } from '@/shared/contexts/CartContext';
 import { useAuth } from '@/shared/contexts/AuthContext';
 import Spinner from '@/shared/components/spinner/Spinner';
@@ -14,6 +14,7 @@ import {
   checkoutValidationSchema,
   type CheckoutFormData,
 } from '@/shared/validation/checkout.validation';
+import { useTranslations } from 'next-intl';
 
 const inputClass = (hasError: boolean) =>
   `w-full px-4 py-3 border rounded-xl text-sm text-slate-900 placeholder-slate-400 bg-white focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all ${
@@ -21,6 +22,7 @@ const inputClass = (hasError: boolean) =>
   }`;
 
 const Checkout = () => {
+  const t = useTranslations('checkout');
   const { cartItems, total, itemCount, loading, mounted } = useCart();
   const { isAuthenticated, user } = useAuth();
   const [isProcessing, setIsProcessing] = useState(false);
@@ -94,7 +96,7 @@ const Checkout = () => {
       setValidatedSteps((prev) => new Set(prev).add(currentStep));
       setCurrentStep((prev) => Math.min(prev + 1, 3));
     } else {
-      toast.error('Please fill in all required fields correctly');
+      toast.error(t('fillFields'));
     }
   };
 
@@ -105,7 +107,7 @@ const Checkout = () => {
   const handlePlaceOrder = async () => {
     const isValid = await trigger();
     if (!isValid) {
-      toast.error('Please fill in all required fields correctly');
+      toast.error(t('fillFields'));
       return;
     }
 
@@ -176,13 +178,11 @@ const Checkout = () => {
               />
             </svg>
           </div>
-          <h2 className="text-slate-900 text-xl font-bold mb-2">Your Cart is Empty</h2>
-          <p className="text-slate-500 text-sm mb-6">
-            Add some items to your cart before checkout.
-          </p>
+          <h2 className="text-slate-900 text-xl font-bold mb-2">{t('cartEmpty')}</h2>
+          <p className="text-slate-500 text-sm mb-6">{t('cartEmptySubtitle')}</p>
           <Link href="/products">
             <Button className="bg-amber-500 hover:bg-amber-400 text-white px-6 py-2.5 text-sm font-semibold rounded-xl transition-colors shadow-sm shadow-amber-500/30">
-              Start Shopping
+              {t('startShopping')}
             </Button>
           </Link>
         </div>
@@ -195,9 +195,9 @@ const Checkout = () => {
   const orderTotal = total + shippingCost + tax;
 
   const steps = [
-    { num: 1, label: 'Shipping' },
-    { num: 2, label: 'Payment' },
-    { num: 3, label: 'Review' },
+    { num: 1, label: t('shipping') },
+    { num: 2, label: t('payment') },
+    { num: 3, label: t('review') },
   ];
 
   return (
@@ -206,9 +206,9 @@ const Checkout = () => {
       <div className="bg-slate-900 border-b border-slate-800/60">
         <div className="container mx-auto px-4 lg:px-16 py-8">
           <p className="text-amber-400 text-xs font-semibold uppercase tracking-widest mb-1">
-            Checkout
+            {t('subtitle')}
           </p>
-          <h1 className="text-white text-2xl font-bold">Complete Your Order</h1>
+          <h1 className="text-white text-2xl font-bold">{t('title')}</h1>
         </div>
       </div>
 
@@ -232,7 +232,7 @@ const Checkout = () => {
                           setValidatedSteps((prev) => new Set(prev).add(currentStep));
                           setCurrentStep(step.num);
                         } else {
-                          toast.error('Please fill in all required fields correctly');
+                          toast.error(t('fillFields'));
                         }
                       } else {
                         setCurrentStep(step.num);
@@ -286,24 +286,24 @@ const Checkout = () => {
               {/* Step 1: Shipping */}
               {currentStep === 1 && (
                 <div>
-                  <h2 className="text-slate-900 text-lg font-bold mb-6">Shipping Information</h2>
+                  <h2 className="text-slate-900 text-lg font-bold mb-6">{t('shippingInfo')}</h2>
 
                   <div className="space-y-6">
                     {/* Contact */}
                     <div>
                       <h3 className="text-slate-700 text-sm font-bold uppercase tracking-wider mb-4">
-                        Contact
+                        {t('contact')}
                       </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                           <label className="block text-xs font-semibold text-slate-600 mb-1.5">
-                            Email Address *
+                            {t('emailAddress')} *
                           </label>
                           <input
                             type="email"
                             {...register('email')}
                             className={inputClass(!!errors.email)}
-                            placeholder="your@email.com"
+                            placeholder={t('emailPlaceholder')}
                           />
                           {errors.email && (
                             <p className="mt-1 text-xs text-red-500">{errors.email.message}</p>
@@ -311,13 +311,13 @@ const Checkout = () => {
                         </div>
                         <div>
                           <label className="block text-xs font-semibold text-slate-600 mb-1.5">
-                            Phone Number *
+                            {t('phoneNumber')} *
                           </label>
                           <input
                             type="tel"
                             {...register('phone')}
                             className={inputClass(!!errors.phone)}
-                            placeholder="+351123456789"
+                            placeholder={t('phonePlaceholder')}
                           />
                           {errors.phone && (
                             <p className="mt-1 text-xs text-red-500">{errors.phone.message}</p>
@@ -329,13 +329,13 @@ const Checkout = () => {
                     {/* Address */}
                     <div>
                       <h3 className="text-slate-700 text-sm font-bold uppercase tracking-wider mb-4">
-                        Shipping Address
+                        {t('shippingAddress')}
                       </h3>
                       <div className="space-y-4">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div>
                             <label className="block text-xs font-semibold text-slate-600 mb-1.5">
-                              First Name *
+                              {t('firstName')} *
                             </label>
                             <input
                               type="text"
@@ -350,7 +350,7 @@ const Checkout = () => {
                           </div>
                           <div>
                             <label className="block text-xs font-semibold text-slate-600 mb-1.5">
-                              Last Name *
+                              {t('lastName')} *
                             </label>
                             <input
                               type="text"
@@ -364,13 +364,13 @@ const Checkout = () => {
                         </div>
                         <div>
                           <label className="block text-xs font-semibold text-slate-600 mb-1.5">
-                            Street Address *
+                            {t('streetAddress')} *
                           </label>
                           <input
                             type="text"
                             {...register('address')}
                             className={inputClass(!!errors.address)}
-                            placeholder="123 Main Street"
+                            placeholder={t('streetPlaceholder')}
                           />
                           {errors.address && (
                             <p className="mt-1 text-xs text-red-500">{errors.address.message}</p>
@@ -379,7 +379,7 @@ const Checkout = () => {
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                           <div>
                             <label className="block text-xs font-semibold text-slate-600 mb-1.5">
-                              City *
+                              {t('city')} *
                             </label>
                             <input
                               type="text"
@@ -392,7 +392,7 @@ const Checkout = () => {
                           </div>
                           <div>
                             <label className="block text-xs font-semibold text-slate-600 mb-1.5">
-                              Postal Code *
+                              {t('postalCode')} *
                             </label>
                             <input
                               type="text"
@@ -408,7 +408,7 @@ const Checkout = () => {
                           </div>
                           <div>
                             <label className="block text-xs font-semibold text-slate-600 mb-1.5">
-                              Country *
+                              {t('country')} *
                             </label>
                             <select
                               {...register('country')}
@@ -433,9 +433,7 @@ const Checkout = () => {
                           id="saveInfo"
                           className="w-4 h-4 rounded border-slate-300 text-amber-500 focus:ring-amber-500"
                         />
-                        <span className="text-sm text-slate-600">
-                          Save this information for next time
-                        </span>
+                        <span className="text-sm text-slate-600">{t('saveInfo')}</span>
                       </label>
                     )}
                   </div>
@@ -443,14 +441,14 @@ const Checkout = () => {
                   <div className="mt-8 flex justify-between items-center pt-6 border-t border-slate-100">
                     <Link href="/cart">
                       <Button className="text-slate-600 hover:text-slate-900 text-sm font-medium transition-colors flex items-center gap-1">
-                        ← Back to Cart
+                        {t('backToCart')}
                       </Button>
                     </Link>
                     <Button
                       onClick={handleNextStep}
                       className="bg-amber-500 hover:bg-amber-400 text-white px-6 py-2.5 text-sm font-semibold rounded-xl transition-colors shadow-sm shadow-amber-500/30"
                     >
-                      Continue to Payment →
+                      {t('continueToPayment')}
                     </Button>
                   </div>
                 </div>
@@ -459,7 +457,7 @@ const Checkout = () => {
               {/* Step 2: Payment */}
               {currentStep === 2 && (
                 <div>
-                  <h2 className="text-slate-900 text-lg font-bold mb-6">Payment Method</h2>
+                  <h2 className="text-slate-900 text-lg font-bold mb-6">{t('paymentMethod')}</h2>
 
                   <div className="space-y-4">
                     <div className="bg-amber-50 border border-amber-200 rounded-2xl p-6">
@@ -480,13 +478,8 @@ const Checkout = () => {
                           </svg>
                         </div>
                         <div className="flex-1">
-                          <h3 className="font-bold text-slate-900 mb-1">
-                            Secure Payment via Stripe
-                          </h3>
-                          <p className="text-slate-600 text-sm mb-3">
-                            You&apos;ll be redirected to Stripe&apos;s secure checkout to enter your
-                            payment details.
-                          </p>
+                          <h3 className="font-bold text-slate-900 mb-1">{t('stripeSecure')}</h3>
+                          <p className="text-slate-600 text-sm mb-3">{t('stripeDesc')}</p>
                           <div className="flex items-center gap-4 text-xs text-slate-500">
                             <span className="flex items-center gap-1">
                               <svg
@@ -502,7 +495,7 @@ const Checkout = () => {
                                   d="M5 13l4 4L19 7"
                                 />
                               </svg>
-                              PCI-DSS Compliant
+                              {t('pciCompliant')}
                             </span>
                             <span className="flex items-center gap-1">
                               <svg
@@ -518,7 +511,7 @@ const Checkout = () => {
                                   d="M5 13l4 4L19 7"
                                 />
                               </svg>
-                              SSL Encrypted
+                              {t('sslEncrypted')}
                             </span>
                           </div>
                         </div>
@@ -527,7 +520,7 @@ const Checkout = () => {
 
                     <div className="bg-slate-50 border border-slate-100 rounded-2xl p-5">
                       <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">
-                        Accepted Cards
+                        {t('acceptedCards')}
                       </p>
                       <div className="flex items-center gap-3 text-sm text-slate-600">
                         <span className="bg-white border border-slate-200 rounded-lg px-3 py-1.5 font-semibold">
@@ -548,13 +541,13 @@ const Checkout = () => {
                       onClick={handlePreviousStep}
                       className="text-slate-600 hover:text-slate-900 text-sm font-medium transition-colors"
                     >
-                      ← Back
+                      {t('back')}
                     </Button>
                     <Button
                       onClick={handleNextStep}
                       className="bg-amber-500 hover:bg-amber-400 text-white px-6 py-2.5 text-sm font-semibold rounded-xl transition-colors shadow-sm shadow-amber-500/30"
                     >
-                      Review Order →
+                      {t('reviewOrderBtn')}
                     </Button>
                   </div>
                 </div>
@@ -563,18 +556,18 @@ const Checkout = () => {
               {/* Step 3: Review */}
               {currentStep === 3 && (
                 <div>
-                  <h2 className="text-slate-900 text-lg font-bold mb-6">Review Your Order</h2>
+                  <h2 className="text-slate-900 text-lg font-bold mb-6">{t('reviewOrder')}</h2>
 
                   <div className="space-y-4">
                     {/* Shipping summary */}
                     <div className="bg-slate-50 border border-slate-100 rounded-2xl p-5">
                       <div className="flex justify-between items-start mb-3">
-                        <h3 className="text-slate-700 text-sm font-bold">Shipping To</h3>
+                        <h3 className="text-slate-700 text-sm font-bold">{t('shippingTo')}</h3>
                         <button
                           onClick={() => setCurrentStep(1)}
                           className="text-amber-500 hover:text-amber-600 text-xs font-semibold transition-colors"
                         >
-                          Edit
+                          {t('edit')}
                         </button>
                       </div>
                       <div className="text-slate-600 text-sm leading-relaxed">
@@ -594,20 +587,20 @@ const Checkout = () => {
                     {/* Payment summary */}
                     <div className="bg-slate-50 border border-slate-100 rounded-2xl p-5">
                       <div className="flex justify-between items-start mb-2">
-                        <h3 className="text-slate-700 text-sm font-bold">Payment Method</h3>
+                        <h3 className="text-slate-700 text-sm font-bold">{t('paymentMethod')}</h3>
                         <button
                           onClick={() => setCurrentStep(2)}
                           className="text-amber-500 hover:text-amber-600 text-xs font-semibold transition-colors"
                         >
-                          Edit
+                          {t('edit')}
                         </button>
                       </div>
-                      <p className="text-slate-600 text-sm">Stripe Secure Checkout</p>
+                      <p className="text-slate-600 text-sm">{t('stripeCheckout')}</p>
                     </div>
 
                     {/* Items */}
                     <div>
-                      <h3 className="text-slate-700 text-sm font-bold mb-3">Order Items</h3>
+                      <h3 className="text-slate-700 text-sm font-bold mb-3">{t('orderItems')}</h3>
                       <div className="space-y-2">
                         {cartItems.map((item) => (
                           <div
@@ -627,7 +620,9 @@ const Checkout = () => {
                               <p className="text-slate-900 text-sm font-medium truncate">
                                 {item.product?.name}
                               </p>
-                              <p className="text-slate-400 text-xs mt-0.5">Qty: {item.quantity}</p>
+                              <p className="text-slate-400 text-xs mt-0.5">
+                                {t('qty')}: {item.quantity}
+                              </p>
                             </div>
                             <p className="text-slate-900 font-bold text-sm whitespace-nowrap">
                               €{((item.product?.price || 0) * item.quantity).toFixed(2)}
@@ -643,14 +638,16 @@ const Checkout = () => {
                       onClick={handlePreviousStep}
                       className="text-slate-600 hover:text-slate-900 text-sm font-medium transition-colors"
                     >
-                      ← Back
+                      {t('back')}
                     </Button>
                     <Button
                       onClick={handlePlaceOrder}
                       disabled={isProcessing}
                       className="bg-green-500 hover:bg-green-400 text-white px-6 py-2.5 text-sm font-bold rounded-xl transition-colors shadow-sm shadow-green-500/30 disabled:opacity-60"
                     >
-                      {isProcessing ? 'Redirecting to Stripe...' : `Pay €${orderTotal.toFixed(2)}`}
+                      {isProcessing
+                        ? t('redirecting')
+                        : t('pay', { total: `€${orderTotal.toFixed(2)}` })}
                     </Button>
                   </div>
                 </div>
@@ -661,7 +658,7 @@ const Checkout = () => {
           {/* Order summary sidebar */}
           <div className="lg:col-span-1">
             <div className="bg-white rounded-2xl border border-slate-100 p-6 sticky top-24">
-              <h2 className="text-slate-900 text-base font-bold mb-4">Order Summary</h2>
+              <h2 className="text-slate-900 text-base font-bold mb-4">{t('orderSummary')}</h2>
 
               <div className="space-y-2 mb-4">
                 {cartItems.slice(0, 3).map((item) => (
@@ -677,26 +674,29 @@ const Checkout = () => {
                 ))}
                 {cartItems.length > 3 && (
                   <p className="text-xs text-slate-400 italic">
-                    +{cartItems.length - 3} more {cartItems.length - 3 === 1 ? 'item' : 'items'}
+                    {t('moreItems', {
+                      count: cartItems.length - 3,
+                      items: cartItems.length - 3 === 1 ? t('moreItem') : t('moreItemPlural'),
+                    })}
                   </p>
                 )}
               </div>
 
               <div className="border-t border-slate-100 pt-4 space-y-2.5">
                 <div className="flex justify-between text-sm text-slate-500">
-                  <span>Subtotal ({itemCount} items)</span>
+                  <span>{t('subtotal', { count: itemCount })}</span>
                   <span className="font-medium text-slate-700">€{total.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-sm text-slate-500">
-                  <span>Shipping</span>
-                  <span className="font-semibold text-green-600">FREE</span>
+                  <span>{t('shipping')}</span>
+                  <span className="font-semibold text-green-600">{t('freeShipping')}</span>
                 </div>
                 <div className="flex justify-between text-sm text-slate-500">
-                  <span>VAT (23%)</span>
+                  <span>{t('vat')}</span>
                   <span className="font-medium text-slate-700">€{tax.toFixed(2)}</span>
                 </div>
                 <div className="border-t border-slate-100 pt-3 flex justify-between">
-                  <span className="font-bold text-slate-900">Total</span>
+                  <span className="font-bold text-slate-900">{t('total')}</span>
                   <span className="font-bold text-xl text-slate-900">€{orderTotal.toFixed(2)}</span>
                 </div>
               </div>
@@ -704,9 +704,9 @@ const Checkout = () => {
               {/* Trust badges */}
               <div className="mt-5 pt-4 border-t border-slate-100 space-y-2">
                 {[
-                  { icon: '🔒', text: 'SSL Encrypted Checkout' },
-                  { icon: '🚚', text: 'Free shipping on this order' },
-                  { icon: '↩️', text: 'Easy 30-day returns' },
+                  { icon: '🔒', text: t('sslBadge') },
+                  { icon: '🚚', text: t('freeShippingBadge') },
+                  { icon: '↩️', text: t('returnsBadge') },
                 ].map((badge) => (
                   <div key={badge.text} className="flex items-center gap-2 text-xs text-slate-500">
                     <span>{badge.icon}</span>

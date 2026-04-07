@@ -6,7 +6,8 @@ import { GET_ORDERS } from '@/entities/order/api/order.queries';
 import Spinner from '@/shared/components/spinner/Spinner';
 import { Package, Calendar, CreditCard, ChevronDown, ChevronUp } from 'lucide-react';
 import Image from 'next/image';
-import Link from 'next/link';
+import { Link } from '@/i18n/navigation';
+import { useTranslations, useLocale } from 'next-intl';
 
 interface OrderItem {
   id: string;
@@ -58,15 +59,17 @@ const getPaymentStatusStyle = (status: string) => {
   }
 };
 
-const formatDate = (dateString: string) => {
-  return new Date(dateString).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
-};
-
 export default function OrdersTab() {
+  const t = useTranslations('profile');
+  const locale = useLocale();
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString(locale, {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+  };
   const { data, loading, error } = useQuery<{ orders: Order[] }>(GET_ORDERS, {
     fetchPolicy: 'network-only',
   });
@@ -110,8 +113,8 @@ export default function OrdersTab() {
             />
           </svg>
         </div>
-        <p className="text-slate-600 font-medium">Failed to load orders.</p>
-        <p className="text-slate-400 text-sm mt-1">Please try again later.</p>
+        <p className="text-slate-600 font-medium">{t('failedLoadOrders')}</p>
+        <p className="text-slate-400 text-sm mt-1">{t('tryAgainLater')}</p>
       </div>
     );
   }
@@ -124,13 +127,13 @@ export default function OrdersTab() {
         <div className="w-20 h-20 mx-auto bg-slate-100 rounded-full flex items-center justify-center mb-5">
           <Package className="w-10 h-10 text-slate-400" />
         </div>
-        <h3 className="text-xl font-bold text-slate-900 mb-2">No orders yet</h3>
-        <p className="text-slate-500 mb-6">Start shopping to see your orders here!</p>
+        <h3 className="text-xl font-bold text-slate-900 mb-2">{t('noOrders')}</h3>
+        <p className="text-slate-500 mb-6">{t('noOrdersStart')}</p>
         <Link
           href="/products"
           className="inline-block bg-amber-500 hover:bg-amber-400 text-white font-semibold px-7 py-3 rounded-2xl transition-colors shadow-lg shadow-amber-500/30"
         >
-          Start Shopping
+          {t('startShopping')}
         </Link>
       </div>
     );
@@ -139,9 +142,11 @@ export default function OrdersTab() {
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center mb-2">
-        <h2 className="text-xl font-bold text-slate-900">Order History</h2>
+        <h2 className="text-xl font-bold text-slate-900">{t('orderHistory')}</h2>
         <span className="text-slate-400 text-sm">
-          {orders.length} order{orders.length !== 1 ? 's' : ''}
+          {orders.length !== 1
+            ? t('ordersCount', { count: orders.length })
+            : t('orderCount', { count: orders.length })}
         </span>
       </div>
 
@@ -160,7 +165,7 @@ export default function OrdersTab() {
               <div className="flex flex-wrap justify-between items-center gap-4">
                 <div className="flex flex-wrap items-center gap-6">
                   <div>
-                    <p className="text-xs text-slate-400 font-medium mb-0.5">Order</p>
+                    <p className="text-xs text-slate-400 font-medium mb-0.5">{t('orderLabel')}</p>
                     <p className="text-slate-900 font-bold">{order.orderNumber}</p>
                   </div>
                   <div className="flex items-center gap-1.5 text-slate-500 text-sm">
@@ -197,11 +202,13 @@ export default function OrdersTab() {
                   <div className="flex items-center gap-1.5 text-slate-500 text-sm">
                     <Package className="w-4 h-4" />
                     <span>
-                      {order.items.length} item{order.items.length !== 1 ? 's' : ''}
+                      {order.items.length !== 1
+                        ? t('itemCount', { count: order.items.length })
+                        : t('itemCountSingular', { count: order.items.length })}
                     </span>
                   </div>
                   <div className="flex items-center gap-2 text-sm">
-                    <span className="text-slate-400">Payment:</span>
+                    <span className="text-slate-400">{t('payment')}</span>
                     <span
                       className={`px-2.5 py-0.5 rounded-full text-xs font-semibold ${getPaymentStatusStyle(order.paymentStatus)}`}
                     >
@@ -234,11 +241,13 @@ export default function OrdersTab() {
                         <h4 className="font-semibold text-slate-900 text-sm truncate">
                           {item.name}
                         </h4>
-                        <p className="text-slate-400 text-xs mt-0.5">Qty: {item.quantity}</p>
+                        <p className="text-slate-400 text-xs mt-0.5">
+                          {t('qty')}: {item.quantity}
+                        </p>
                       </div>
                       <div className="text-right flex-shrink-0">
                         <p className="font-bold text-slate-900">€{item.price.toFixed(2)}</p>
-                        <p className="text-slate-400 text-xs">each</p>
+                        <p className="text-slate-400 text-xs">{t('each')}</p>
                       </div>
                     </div>
                   ))}
@@ -247,10 +256,10 @@ export default function OrdersTab() {
                 {/* Actions */}
                 <div className="flex justify-end gap-3 pt-2">
                   <button className="px-4 py-2 border border-slate-200 text-slate-600 hover:bg-slate-50 rounded-xl transition-colors font-medium text-sm">
-                    View Details
+                    {t('viewDetails')}
                   </button>
                   <button className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl transition-colors font-medium text-sm">
-                    Download Invoice
+                    {t('downloadInvoice')}
                   </button>
                 </div>
               </div>

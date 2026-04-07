@@ -1,16 +1,18 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/i18n/navigation';
 import { useAuth } from '@/shared/contexts/AuthContext';
 import { useActivityTracker } from '@/shared/hooks/useActivityTracker';
 import { LogOut } from 'lucide-react';
-import Link from 'next/link';
+import { Link } from '@/i18n/navigation';
+import { useTranslations } from 'next-intl';
 
 export default function LogoutPage() {
   const router = useRouter();
   const { user, logout } = useAuth();
   const { trackActivity } = useActivityTracker();
+  const t = useTranslations('auth');
 
   useEffect(() => {
     if (user) {
@@ -37,10 +39,8 @@ export default function LogoutPage() {
           <LogOut className="w-9 h-9 text-amber-500" />
         </div>
 
-        <h1 className="text-slate-900 text-2xl font-bold mb-2">Logging Out...</h1>
-        <p className="text-slate-500 text-sm mb-8">
-          You have been successfully signed out. Redirecting you to the homepage shortly.
-        </p>
+        <h1 className="text-slate-900 text-2xl font-bold mb-2">{t('loggingOut')}</h1>
+        <p className="text-slate-500 text-sm mb-8">{t('signedOutRedirecting')}</p>
 
         {/* Spinner */}
         <div className="flex justify-center mb-8">
@@ -51,7 +51,7 @@ export default function LogoutPage() {
           href="/"
           className="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-400 text-white font-semibold px-6 py-2.5 rounded-xl transition-colors shadow-sm shadow-amber-500/30 text-sm"
         >
-          Go to Homepage
+          {t('goToHomepage')}
           <svg
             className="w-4 h-4"
             fill="none"

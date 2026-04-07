@@ -1,10 +1,12 @@
 'use client';
 
 import { useEffect, useState, Suspense } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
+import { useRouter } from '@/i18n/navigation';
 import { useQuery } from '@apollo/client';
 import { gql } from '@apollo/client';
 import { CheckCircle, Package, Mail, Phone, MapPin, CreditCard, Calendar } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 const ORDER_BY_NUMBER_QUERY = gql`
   query OrderByNumber($orderNumber: String!) {
@@ -71,6 +73,7 @@ interface Order {
 function OrderConfirmationContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const t = useTranslations('checkoutSuccess');
   const orderNumber = searchParams.get('orderNumber');
   const [mounted, setMounted] = useState(false);
 
@@ -92,7 +95,7 @@ function OrderConfirmationContent() {
   if (!mounted || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-sky-900 text-lg">Loading order details...</div>
+        <div className="text-sky-900 text-lg">{t('loadingOrder')}</div>
       </div>
     );
   }
@@ -101,15 +104,13 @@ function OrderConfirmationContent() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Order Not Found</h1>
-          <p className="text-gray-600 mb-4">
-            We couldn&apos;t find an order with this order number.
-          </p>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">{t('orderNotFound')}</h1>
+          <p className="text-gray-600 mb-4">{t('orderNotFoundDesc')}</p>
           <button
             onClick={() => router.push('/')}
             className="px-6 py-2 bg-sky-600 text-white rounded-lg hover:bg-sky-700 transition"
           >
-            Back to Home
+            {t('backToHome')}
           </button>
         </div>
       </div>
@@ -157,7 +158,7 @@ function OrderConfirmationContent() {
           <div className="flex justify-center mb-4">
             <CheckCircle className="w-16 h-16 text-green-500" />
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Order Confirmed!</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">{t('title')}</h1>
           <p className="text-gray-600 mb-4">
             Thank you for your order. We&apos;ve sent a confirmation email to{' '}
             <span className="font-semibold">{order.email}</span>
@@ -165,16 +166,16 @@ function OrderConfirmationContent() {
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-sky-50 rounded-lg">
             <Package className="w-5 h-5 text-sky-600" />
             <span className="text-sm font-medium text-sky-900">
-              Order Number: <span className="font-bold">{order.orderNumber}</span>
+              {t('orderNumber')}: <span className="font-bold">{order.orderNumber}</span>
             </span>
           </div>
         </div>
 
         <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Order Status</h2>
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">{t('orderStatus')}</h2>
           <div className="flex flex-wrap gap-4">
             <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-600">Order Status:</span>
+              <span className="text-sm text-gray-600">{t('orderStatusLabel')}</span>
               <span
                 className={`px-3 py-1 text-xs font-semibold rounded-full ${getStatusColor(
                   order.status
@@ -184,7 +185,7 @@ function OrderConfirmationContent() {
               </span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-600">Payment Status:</span>
+              <span className="text-sm text-gray-600">{t('paymentStatusLabel')}</span>
               <span
                 className={`px-3 py-1 text-xs font-semibold rounded-full ${getPaymentStatusColor(
                   order.paymentStatus
@@ -209,7 +210,7 @@ function OrderConfirmationContent() {
         </div>
 
         <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Order Items</h2>
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">{t('orderItems')}</h2>
           <div className="space-y-4">
             {order.items.map((item) => (
               <div key={item.id} className="flex gap-4 pb-4 border-b last:border-b-0">
@@ -227,8 +228,12 @@ function OrderConfirmationContent() {
                 )}
                 <div className="flex-grow">
                   <h3 className="font-medium text-gray-900">{item.name}</h3>
-                  <p className="text-sm text-gray-600">Quantity: {item.quantity}</p>
-                  <p className="text-sm text-gray-600">${item.price.toFixed(2)} each</p>
+                  <p className="text-sm text-gray-600">
+                    {t('quantity')}: {item.quantity}
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    ${item.price.toFixed(2)} {t('each')}
+                  </p>
                 </div>
                 <div className="text-right">
                   <p className="font-semibold text-gray-900">
@@ -241,19 +246,19 @@ function OrderConfirmationContent() {
 
           <div className="mt-6 pt-6 border-t space-y-2">
             <div className="flex justify-between text-sm">
-              <span className="text-gray-600">Subtotal:</span>
+              <span className="text-gray-600">{t('subtotal')}</span>
               <span className="text-gray-900">${order.subtotal.toFixed(2)}</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-gray-600">Tax:</span>
+              <span className="text-gray-600">{t('tax')}</span>
               <span className="text-gray-900">${order.tax.toFixed(2)}</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-gray-600">Shipping:</span>
+              <span className="text-gray-600">{t('shipping')}</span>
               <span className="text-gray-900">${order.shipping.toFixed(2)}</span>
             </div>
             <div className="flex justify-between text-lg font-semibold pt-2 border-t">
-              <span className="text-gray-900">Total:</span>
+              <span className="text-gray-900">{t('total')}</span>
               <span className="text-sky-600">${order.total.toFixed(2)}</span>
             </div>
           </div>
@@ -263,7 +268,7 @@ function OrderConfirmationContent() {
           <div className="bg-white rounded-lg shadow-sm p-6">
             <div className="flex items-center gap-2 mb-4">
               <MapPin className="w-5 h-5 text-sky-600" />
-              <h2 className="text-xl font-semibold text-gray-900">Shipping Address</h2>
+              <h2 className="text-xl font-semibold text-gray-900">{t('shippingAddress')}</h2>
             </div>
             <div className="space-y-1 text-sm text-gray-600">
               <p className="font-semibold text-gray-900">
@@ -290,7 +295,7 @@ function OrderConfirmationContent() {
           <div className="bg-white rounded-lg shadow-sm p-6">
             <div className="flex items-center gap-2 mb-4">
               <CreditCard className="w-5 h-5 text-sky-600" />
-              <h2 className="text-xl font-semibold text-gray-900">Payment Method</h2>
+              <h2 className="text-xl font-semibold text-gray-900">{t('paymentMethod')}</h2>
             </div>
             <div className="space-y-2 text-sm text-gray-600">
               <p className="font-semibold text-gray-900 capitalize">
@@ -312,13 +317,13 @@ function OrderConfirmationContent() {
             onClick={() => router.push('/products')}
             className="px-6 py-3 bg-sky-600 text-white rounded-lg hover:bg-sky-700 transition font-medium"
           >
-            Continue Shopping
+            {t('continueShopping')}
           </button>
           <button
             onClick={() => router.push('/')}
             className="px-6 py-3 bg-white text-sky-600 border border-sky-600 rounded-lg hover:bg-sky-50 transition font-medium"
           >
-            Back to Home
+            {t('backToHome')}
           </button>
         </div>
       </div>

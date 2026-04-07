@@ -1,7 +1,7 @@
 const FacebookIcon = () => {
   return (
     <svg
-      className="hover:stroke-blue-500 stroke-slate-600"
+      className="stroke-white"
       width="25"
       height="24"
       viewBox="0 0 25 24"

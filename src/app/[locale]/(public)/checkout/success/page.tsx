@@ -1,16 +1,19 @@
 'use client';
 
 import { useEffect, useState, Suspense } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import Link from 'next/link';
+import { useRouter } from '@/i18n/navigation';
+import { useSearchParams } from 'next/navigation';
+import { Link } from '@/i18n/navigation';
 import Button from '@/shared/components/elements/Button';
 import Spinner from '@/shared/components/spinner/Spinner';
 import { useAuth } from '@/shared/contexts/AuthContext';
+import { useTranslations } from 'next-intl';
 
 function SuccessContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { isAuthenticated } = useAuth();
+  const t = useTranslations('checkoutSuccess');
   const [loading, setLoading] = useState(true);
   const [orderNumber, setOrderNumber] = useState<string | null>(null);
 
@@ -69,39 +72,36 @@ function SuccessContent() {
         </div>
 
         <p className="text-green-500 text-sm font-semibold uppercase tracking-widest mb-2">
-          Order Confirmed
+          {t('orderConfirmed')}
         </p>
-        <h1 className="text-slate-900 text-2xl font-bold mb-3">Thank You for Your Order!</h1>
+        <h1 className="text-slate-900 text-2xl font-bold mb-3">{t('thankYouOrder')}</h1>
 
         {orderNumber && (
           <div className="bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 mb-4 inline-block">
-            <span className="text-slate-500 text-sm">Order Number: </span>
+            <span className="text-slate-500 text-sm">{t('orderNumber')}: </span>
             <span className="text-slate-900 font-bold text-sm">#{orderNumber}</span>
           </div>
         )}
 
-        <p className="text-slate-500 text-sm leading-relaxed mb-8">
-          Your payment has been processed successfully. You will receive an email confirmation
-          shortly with your order details.
-        </p>
+        <p className="text-slate-500 text-sm leading-relaxed mb-8">{t('paymentProcessed')}</p>
 
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           {isAuthenticated ? (
             <Link href="/profile?tab=orders">
               <Button className="w-full sm:w-auto bg-slate-900 hover:bg-slate-800 text-white px-6 py-2.5 text-sm font-semibold rounded-xl transition-colors shadow-sm">
-                View My Orders
+                {t('viewMyOrders')}
               </Button>
             </Link>
           ) : orderNumber ? (
             <Link href={`/order-confirmation?orderNumber=${orderNumber}`}>
               <Button className="w-full sm:w-auto bg-slate-900 hover:bg-slate-800 text-white px-6 py-2.5 text-sm font-semibold rounded-xl transition-colors shadow-sm">
-                View Order Details
+                {t('viewOrderDetails')}
               </Button>
             </Link>
           ) : null}
           <Link href="/products">
             <Button className="w-full sm:w-auto bg-amber-500 hover:bg-amber-400 text-white px-6 py-2.5 text-sm font-semibold rounded-xl transition-colors shadow-sm shadow-amber-500/30">
-              Continue Shopping
+              {t('continueShopping')}
             </Button>
           </Link>
         </div>
@@ -109,9 +109,9 @@ function SuccessContent() {
         {/* Trust badges */}
         <div className="mt-8 pt-6 border-t border-slate-100 grid grid-cols-3 gap-3">
           {[
-            { icon: '🔒', label: 'Secure Payment' },
-            { icon: '📦', label: 'Fast Shipping' },
-            { icon: '↩️', label: 'Easy Returns' },
+            { icon: '🔒', label: t('securePayment') },
+            { icon: '📦', label: t('fastShipping') },
+            { icon: '↩️', label: t('easyReturns') },
           ].map((badge) => (
             <div key={badge.label} className="text-center">
               <div className="text-xl mb-1">{badge.icon}</div>

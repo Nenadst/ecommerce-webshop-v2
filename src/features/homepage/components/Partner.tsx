@@ -1,12 +1,14 @@
 import React from 'react';
 import { PARTNERS } from '@/data/partners';
+import { useTranslations } from 'next-intl';
 
 const Partner = () => {
+  const t = useTranslations('homepage');
   return (
     <section className="container mx-auto px-4 py-8 mb-4">
       <div className="text-center mb-6">
         <p className="text-slate-400 text-sm font-medium tracking-widest uppercase">
-          Trusted by leading brands worldwide
+          {t('trustedBrands')}
         </p>
       </div>
       <div className="flex flex-wrap justify-center items-center gap-8 md:gap-12 lg:gap-16 bg-slate-50 rounded-2xl p-8 md:p-10">

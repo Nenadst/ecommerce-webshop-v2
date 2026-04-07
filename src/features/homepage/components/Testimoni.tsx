@@ -1,14 +1,18 @@
+'use client';
+
 import React from 'react';
 import { TESTIMONI } from '@/data/testimoni';
+import { useTranslations } from 'next-intl';
 
 const Testimoni = () => {
+  const t = useTranslations('homepage');
   return (
     <section className="container mx-auto px-4 py-8">
       <div className="text-center mb-8">
         <p className="text-amber-500 text-sm font-semibold uppercase tracking-widest mb-2">
-          Testimonials
+          {t('testimonialLabel')}
         </p>
-        <h2 className="text-slate-900 text-2xl md:text-3xl font-bold">What Our Customers Say</h2>
+        <h2 className="text-slate-900 text-2xl md:text-3xl font-bold">{t('testimonials')}</h2>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
         {TESTIMONI.map((testimoni, index) => (
@@ -34,7 +38,7 @@ const Testimoni = () => {
                 <div className="text-slate-800 text-sm font-semibold truncate">
                   {testimoni.name}
                 </div>
-                <div className="text-slate-400 text-xs">Verified Buyer</div>
+                <div className="text-slate-400 text-xs">{t('verifiedBuyer')}</div>
               </div>
               <div className="text-amber-400 text-xs font-semibold flex-shrink-0">★★★★★</div>
             </div>

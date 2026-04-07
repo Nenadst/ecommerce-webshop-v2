@@ -6,6 +6,7 @@ import { NextRequest } from 'next/server';
 
 interface Context {
   req: NextRequest;
+  locale: string;
 }
 
 const server = new ApolloServer<Context>({
@@ -17,7 +18,9 @@ const server = new ApolloServer<Context>({
 const handler = startServerAndCreateNextHandler(server, {
   context: async (req: NextRequest) => {
     await connectDB();
-    return { req };
+    // Locale injected by middleware via x-locale header; default to 'en'
+    const locale = req.headers.get('x-locale') ?? 'en';
+    return { req, locale };
   },
 });
 

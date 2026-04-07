@@ -7,25 +7,30 @@ import { GET_CATEGORIES } from '@/entities/category/api/category.queries';
 import { Product } from '@/entities/product/types/product.types';
 import { Category } from '@/entities/category/types/category.types';
 import { useActivityTracker } from '@/shared/hooks/useActivityTracker';
+import { TranslationFields, TranslationsState } from './useAddProductForm';
+
+const emptyTranslations = (): TranslationsState => ({
+  en: { name: '', description: '' },
+  fr: { name: '', description: '' },
+  nl: { name: '', description: '' },
+});
 
 export function useEditProductForm() {
   const router = useRouter();
   const params = useParams();
   const productId = params?.id as string;
   const { trackActivity } = useActivityTracker();
+
   const { data: productData, loading: productLoading } = useQuery<{ product: Product }>(
     GET_PRODUCT,
-    {
-      variables: { id: productId },
-    }
+    { variables: { id: productId } }
   );
   const { data: categoriesData, loading: categoriesLoading } = useQuery<{ categories: Category[] }>(
     GET_CATEGORIES
   );
 
   const [form, setForm] = useState({
-    name: '',
-    description: '',
+    translations: emptyTranslations(),
     price: '',
     hasDiscount: false,
     discountPrice: '',
@@ -41,15 +46,35 @@ export function useEditProductForm() {
   useEffect(() => {
     if (productData?.product) {
       const product = productData.product;
+
+      // Build translations state from the fetched translations array
+      const translationsState = emptyTranslations();
+      if (product.translations?.length) {
+        product.translations.forEach((t) => {
+          const locale = t.locale as 'en' | 'fr' | 'nl';
+          if (locale in translationsState) {
+            translationsState[locale] = {
+              name: t.name,
+              description: t.description ?? '',
+            };
+          }
+        });
+      } else {
+        // Fallback: populate EN from legacy columns
+        translationsState.en = {
+          name: product.name,
+          description: product.description ?? '',
+        };
+      }
+
       setForm({
-        name: product.name,
-        description: product.description || '',
+        translations: translationsState,
         price: product.price.toString(),
-        hasDiscount: product.hasDiscount || false,
-        discountPrice: product.discountPrice?.toString() || '',
+        hasDiscount: product.hasDiscount ?? false,
+        discountPrice: product.discountPrice?.toString() ?? '',
         quantity: product.quantity.toString(),
-        categoryId: product.category?.id || '',
-        existingImages: product.images || [],
+        categoryId: product.category?.id ?? '',
+        existingImages: product.images ?? [],
         files: [],
         imagePreviews: [],
       });
@@ -60,18 +85,13 @@ export function useEditProductForm() {
     update(cache, { data }) {
       if (!data?.updateProduct) return;
       const updated = data.updateProduct;
-
       cache.modify({
         fields: {
           products(existing, { readField, toReference }) {
             const list = Array.isArray(existing) ? existing : [];
-
             return list.map((item: Reference) =>
               readField('id', item) === updated.id
-                ? toReference({
-                    __typename: 'Product',
-                    id: updated.id,
-                  })
+                ? toReference({ __typename: 'Product', id: updated.id })
                 : item
             );
           },
@@ -91,7 +111,6 @@ export function useEditProductForm() {
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = Array.from(e.target.files || []);
-
     const validFiles = selectedFiles.filter((file) => {
       if (file.size > 2 * 1024 * 1024) {
         toast.error(`${file.name} is larger than 2MB`);
@@ -99,30 +118,25 @@ export function useEditProductForm() {
       }
       return true;
     });
-
     setForm((f) => {
       const availableSlots = 8 - (f.existingImages.length + f.files.length);
       const newFiles = [...f.files, ...validFiles].slice(0, availableSlots);
       const newPreviews = newFiles.map((file) => URL.createObjectURL(file));
       return { ...f, files: newFiles, imagePreviews: newPreviews };
     });
-
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
   const handleExistingImageRemove = (index: number) => {
-    setForm((f) => {
-      const newExistingImages = f.existingImages.filter((_, i) => i !== index);
-      return { ...f, existingImages: newExistingImages };
-    });
+    setForm((f) => ({ ...f, existingImages: f.existingImages.filter((_, i) => i !== index) }));
   };
 
   const handleNewImageRemove = (index: number) => {
-    setForm((f) => {
-      const newFiles = f.files.filter((_, i) => i !== index);
-      const newPreviews = f.imagePreviews.filter((_, i) => i !== index);
-      return { ...f, files: newFiles, imagePreviews: newPreviews };
-    });
+    setForm((f) => ({
+      ...f,
+      files: f.files.filter((_, i) => i !== index),
+      imagePreviews: f.imagePreviews.filter((_, i) => i !== index),
+    }));
   };
 
   const handleAllImagesReorder = (oldIndex: number, newIndex: number) => {
@@ -130,12 +144,12 @@ export function useEditProductForm() {
       const allImages = [...f.existingImages, ...f.imagePreviews];
       const [moved] = allImages.splice(oldIndex, 1);
       allImages.splice(newIndex, 0, moved);
-
       const existingCount = f.existingImages.length;
-      const newExisting = allImages.slice(0, existingCount);
-      const newPreviews = allImages.slice(existingCount);
-
-      return { ...f, existingImages: newExisting, imagePreviews: newPreviews };
+      return {
+        ...f,
+        existingImages: allImages.slice(0, existingCount),
+        imagePreviews: allImages.slice(existingCount),
+      };
     });
   };
 
@@ -152,12 +166,32 @@ export function useEditProductForm() {
     setForm((f) => ({ ...f, [name]: type === 'checkbox' ? checked : value }));
   };
 
+  const handleTranslationChange = (
+    locale: 'en' | 'fr' | 'nl',
+    field: keyof TranslationFields,
+    value: string
+  ) => {
+    setForm((f) => ({
+      ...f,
+      translations: {
+        ...f.translations,
+        [locale]: { ...f.translations[locale], [field]: value },
+      },
+    }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (submittingRef.current) return;
     submittingRef.current = true;
 
     try {
+      if (!form.translations.en.name.trim()) {
+        toast.error('English product name is required');
+        submittingRef.current = false;
+        return;
+      }
+
       const price = parseFloat(form.price);
       const discountPrice = form.discountPrice ? parseFloat(form.discountPrice) : null;
 
@@ -166,13 +200,11 @@ export function useEditProductForm() {
         submittingRef.current = false;
         return;
       }
-
       if (form.hasDiscount && discountPrice !== null && discountPrice <= 0) {
         toast.error('Discount price must be greater than 0');
         submittingRef.current = false;
         return;
       }
-
       if (form.hasDiscount && discountPrice !== null && discountPrice >= price) {
         toast.error('Discount price must be less than the regular price');
         submittingRef.current = false;
@@ -180,18 +212,24 @@ export function useEditProductForm() {
       }
 
       const newImagesBase64 = await Promise.all(form.files.map((file) => convertToBase64(file)));
-
       const allImages = [...form.existingImages, ...newImagesBase64];
+
+      const translations = (['en', 'fr', 'nl'] as const)
+        .filter((l) => form.translations[l].name.trim())
+        .map((l) => ({
+          locale: l,
+          name: form.translations[l].name.trim(),
+          description: form.translations[l].description.trim() || undefined,
+        }));
 
       await updateProduct({
         variables: {
           id: productId,
           input: {
-            name: form.name,
-            description: form.description,
-            price: price,
+            translations,
+            price,
             hasDiscount: form.hasDiscount,
-            discountPrice: discountPrice,
+            discountPrice,
             quantity: parseInt(form.quantity),
             images: allImages,
             categoryId: form.categoryId,
@@ -199,15 +237,14 @@ export function useEditProductForm() {
         },
       });
 
-      // Track admin action
       trackActivity({
         action: 'ADMIN_ACTION',
-        description: `Updated product: ${form.name}`,
+        description: `Updated product: ${form.translations.en.name}`,
         metadata: {
           action: 'UPDATE_PRODUCT',
-          productId: productId,
-          productName: form.name,
-          price: price,
+          productId,
+          productName: form.translations.en.name,
+          price,
           quantity: parseInt(form.quantity),
         },
       });
@@ -233,6 +270,7 @@ export function useEditProductForm() {
     handleNewImageRemove,
     handleAllImagesReorder,
     handleInputChange,
+    handleTranslationChange,
     productLoading,
     categoriesLoading,
     updateLoading,

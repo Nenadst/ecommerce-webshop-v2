@@ -2,13 +2,15 @@
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useQuery } from '@apollo/client';
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/i18n/navigation';
 import Image from 'next/image';
 import { GET_PRODUCTS } from '@/entities/product/api/product.queries';
 import { Product } from '@/entities/product/types/product.types';
 import { useActivityTracker } from '@/shared/hooks/useActivityTracker';
+import { useTranslations } from 'next-intl';
 
 const SearchSection = () => {
+  const t = useTranslations('header');
   const [query, setQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
   const [isOpen, setIsOpen] = useState(false);
@@ -116,7 +118,7 @@ const SearchSection = () => {
           }}
           onFocus={() => query.trim().length >= 2 && setIsOpen(true)}
           onKeyDown={handleKeyDown}
-          placeholder="Search products..."
+          placeholder={t('searchPlaceholder')}
           className="w-full h-12 pl-5 pr-24 bg-white border border-slate-200 rounded-2xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition-all"
         />
         <button
@@ -131,7 +133,7 @@ const SearchSection = () => {
               d="M21 21l-4.35-4.35M17 11A6 6 0 105 11a6 6 0 0012 0z"
             />
           </svg>
-          Search
+          {t('search')}
         </button>
       </form>
 
@@ -141,14 +143,16 @@ const SearchSection = () => {
           {loading && (
             <div className="flex items-center justify-center gap-2 py-6 text-slate-400 text-sm">
               <div className="w-4 h-4 border-2 border-slate-200 border-t-amber-500 rounded-full animate-spin" />
-              Searching...
+              {t('searching')}
             </div>
           )}
 
           {!loading && results.length === 0 && (
             <div className="py-8 text-center">
-              <p className="text-slate-500 text-sm">No products found for</p>
-              <p className="text-slate-800 font-semibold text-sm mt-0.5">&ldquo;{debouncedQuery}&rdquo;</p>
+              <p className="text-slate-500 text-sm">{t('noProductsFoundFor')}</p>
+              <p className="text-slate-800 font-semibold text-sm mt-0.5">
+                &ldquo;{debouncedQuery}&rdquo;
+              </p>
             </div>
           )}
 
@@ -156,14 +160,16 @@ const SearchSection = () => {
             <>
               <div className="px-4 pt-3 pb-2">
                 <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                  {data?.products?.total ?? results.length} results for &ldquo;{debouncedQuery}&rdquo;
+                  {data?.products?.total ?? results.length} results for &ldquo;{debouncedQuery}
+                  &rdquo;
                 </p>
               </div>
               <ul>
                 {results.map((product, index) => {
-                  const price = product.hasDiscount && product.discountPrice
-                    ? product.discountPrice
-                    : product.price;
+                  const price =
+                    product.hasDiscount && product.discountPrice
+                      ? product.discountPrice
+                      : product.price;
                   const isActive = index === activeIndex;
                   return (
                     <li key={product.id}>
@@ -210,7 +216,7 @@ const SearchSection = () => {
                     onClick={handleSubmit as unknown as React.MouseEventHandler}
                     className="w-full py-3 text-sm text-amber-600 font-semibold hover:bg-amber-50 transition-colors"
                   >
-                    View all {data?.products?.total} results →
+                    {t('viewAllResults', { count: data?.products?.total })}
                   </button>
                 </div>
               )}

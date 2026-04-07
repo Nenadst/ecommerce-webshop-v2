@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
+import { Link } from '@/i18n/navigation';
 import { useQuery } from '@apollo/client';
 import { gql } from 'graphql-tag';
 import Star from '@/shared/components/elements/Star';
@@ -13,6 +13,7 @@ import Spinner from '@/shared/components/spinner/Spinner';
 import { useAuth } from '@/shared/contexts/AuthContext';
 import { useCartDrawer } from '@/shared/contexts/CartDrawerContext';
 import toast from 'react-hot-toast';
+import { useTranslations } from 'next-intl';
 
 const GET_FAVORITE_PRODUCTS = gql`
   query GetFavoriteProducts {
@@ -67,6 +68,7 @@ interface Product {
 }
 
 const Wishlist = () => {
+  const t = useTranslations('wishlist');
   const { isAuthenticated } = useAuth();
   const { favorites, toggleFavorite } = useFavorites();
   const { addToCart, cartItems } = useCart();
@@ -187,12 +189,12 @@ const Wishlist = () => {
         <div className="container mx-auto px-4 lg:px-16 py-8">
           <div className="flex items-center gap-2 text-slate-400 text-sm mb-3">
             <Link href="/" className="hover:text-amber-500 transition-colors">
-              Home
+              {t('home')}
             </Link>
             <span>›</span>
-            <span className="text-slate-700 font-medium">Wishlist</span>
+            <span className="text-slate-700 font-medium">{t('title')}</span>
           </div>
-          <h1 className="text-3xl font-bold text-slate-900">My Wishlist</h1>
+          <h1 className="text-3xl font-bold text-slate-900">{t('title')}</h1>
         </div>
       </div>
 
@@ -207,13 +209,11 @@ const Wishlist = () => {
             <div className="w-24 h-24 mx-auto bg-slate-100 rounded-full flex items-center justify-center mb-6">
               <HeartIconBig className="w-12 h-12 text-slate-300" />
             </div>
-            <h2 className="text-2xl font-bold text-slate-900 mb-2">Your wishlist is empty</h2>
-            <p className="text-slate-500 mb-8">
-              Save your favorite products here to keep track of them and add them to cart later.
-            </p>
+            <h2 className="text-2xl font-bold text-slate-900 mb-2">{t('empty')}</h2>
+            <p className="text-slate-500 mb-8">{t('saveFavorites')}</p>
             <Link href="/products">
               <button className="px-8 py-3 bg-amber-500 hover:bg-amber-400 text-white font-semibold rounded-2xl transition-colors shadow-lg shadow-amber-500/30">
-                Start Shopping
+                {t('startShopping')}
               </button>
             </Link>
           </div>
@@ -224,21 +224,21 @@ const Wishlist = () => {
               <div className="flex items-center gap-8">
                 <div className="text-center">
                   <div className="text-2xl font-bold text-slate-900">{displayProducts.length}</div>
-                  <div className="text-slate-400 text-xs font-medium mt-0.5">Total Items</div>
+                  <div className="text-slate-400 text-xs font-medium mt-0.5">{t('totalItems')}</div>
                 </div>
                 <div className="w-px h-10 bg-slate-100" />
                 <div className="text-center">
                   <div className="text-2xl font-bold text-green-500">
                     {displayProducts.filter((p) => p.quantity > 0).length}
                   </div>
-                  <div className="text-slate-400 text-xs font-medium mt-0.5">In Stock</div>
+                  <div className="text-slate-400 text-xs font-medium mt-0.5">{t('inStock')}</div>
                 </div>
                 <div className="w-px h-10 bg-slate-100" />
                 <div className="text-center">
                   <div className="text-2xl font-bold text-slate-900">
                     €{displayProducts.reduce((sum, p) => sum + p.price, 0).toFixed(2)}
                   </div>
-                  <div className="text-slate-400 text-xs font-medium mt-0.5">Total Value</div>
+                  <div className="text-slate-400 text-xs font-medium mt-0.5">{t('totalValue')}</div>
                 </div>
               </div>
               <button
@@ -249,7 +249,7 @@ const Wishlist = () => {
                 }
                 className="px-6 py-3 bg-amber-500 hover:bg-amber-400 text-white font-semibold rounded-2xl transition-colors shadow-lg shadow-amber-500/30 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap text-sm"
               >
-                {addingToCart === 'all' ? 'Adding All...' : 'Add All to Cart'}
+                {addingToCart === 'all' ? t('addingAll') : t('addAllToCart')}
               </button>
             </div>
 
@@ -283,11 +283,11 @@ const Wishlist = () => {
                       {/* Stock badge */}
                       {product.quantity > 0 ? (
                         <span className="absolute bottom-3 left-3 bg-green-500 text-white text-xs font-medium px-2.5 py-1 rounded-full">
-                          In Stock
+                          {t('inStock')}
                         </span>
                       ) : (
                         <span className="absolute bottom-3 left-3 bg-red-500 text-white text-xs font-medium px-2.5 py-1 rounded-full">
-                          Out of Stock
+                          {t('outOfStock')}
                         </span>
                       )}
                     </div>
@@ -304,7 +304,7 @@ const Wishlist = () => {
                         <span className="text-slate-900 text-xl font-bold">€{product.price}</span>
                         {getCartQuantity(product.id) > 0 && (
                           <span className="text-xs text-amber-500 font-semibold bg-amber-50 px-2 py-1 rounded-full">
-                            {getCartQuantity(product.id)} in cart
+                            {t('inCart', { count: getCartQuantity(product.id) })}
                           </span>
                         )}
                       </div>
@@ -317,7 +317,7 @@ const Wishlist = () => {
                         }}
                         className="flex items-center justify-between px-3 py-2 bg-slate-50 border border-slate-100 rounded-xl mb-3"
                       >
-                        <span className="text-slate-500 text-xs font-medium">Qty</span>
+                        <span className="text-slate-500 text-xs font-medium">{t('qty')}</span>
                         <div className="flex items-center gap-2">
                           <button
                             onClick={(e) => {
@@ -387,10 +387,10 @@ const Wishlist = () => {
                         } disabled:opacity-50`}
                       >
                         {addingToCart === product.id
-                          ? 'Adding...'
+                          ? t('adding')
                           : product.quantity > 0
-                            ? 'Add to Cart'
-                            : 'Out of Stock'}
+                            ? t('addToCart')
+                            : t('outOfStock')}
                       </button>
                     </div>
                   </div>
@@ -401,13 +401,13 @@ const Wishlist = () => {
             {/* Bottom CTA */}
             <div className="mt-12 bg-slate-900 rounded-3xl p-8 md:p-10 text-center relative overflow-hidden">
               <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
-              <h3 className="text-white text-2xl font-bold mb-2 relative z-10">Ready to shop?</h3>
-              <p className="text-slate-400 mb-6 relative z-10">
-                Add these items to your cart and complete your purchase.
-              </p>
+              <h3 className="text-white text-2xl font-bold mb-2 relative z-10">
+                {t('readyToShop')}
+              </h3>
+              <p className="text-slate-400 mb-6 relative z-10">{t('readyToShopDesc')}</p>
               <Link href="/products">
                 <button className="px-8 py-3 bg-amber-500 hover:bg-amber-400 text-white font-semibold rounded-full transition-colors shadow-lg shadow-amber-500/30 relative z-10">
-                  Continue Shopping
+                  {t('continueShopping')}
                 </button>
               </Link>
             </div>

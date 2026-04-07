@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { useEditProductForm } from '@/features/admin/products/hooks/useEditProductForm';
 import FullScreenSpinner from '@/shared/components/spinner/FullScreenSpinner';
 import Spinner from '@/shared/components/spinner/Spinner';
@@ -33,7 +34,6 @@ function SortableImageItem({ id, preview, index, isMain, onRemove }: SortableIma
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id,
   });
-
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
@@ -77,7 +77,15 @@ function SortableImageItem({ id, preview, index, isMain, onRemove }: SortableIma
   );
 }
 
+const LOCALES = [
+  { key: 'en' as const, label: 'EN', fullLabel: 'English', required: true },
+  { key: 'fr' as const, label: 'FR', fullLabel: 'French', required: false },
+  { key: 'nl' as const, label: 'NL', fullLabel: 'Dutch', required: false },
+];
+
 export default function AdminEditProductForm() {
+  const [activeLocale, setActiveLocale] = useState<'en' | 'fr' | 'nl'>('en');
+
   const {
     form,
     categoriesData,
@@ -88,6 +96,7 @@ export default function AdminEditProductForm() {
     handleNewImageRemove,
     handleAllImagesReorder,
     handleInputChange,
+    handleTranslationChange,
     productLoading,
     categoriesLoading,
     updateLoading,
@@ -96,21 +105,16 @@ export default function AdminEditProductForm() {
 
   const sensors = useSensors(
     useSensor(PointerSensor),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    })
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   );
 
-  if (productLoading || categoriesLoading) {
-    return <FullScreenSpinner />;
-  }
+  if (productLoading || categoriesLoading) return <FullScreenSpinner />;
 
   const allImages = [...form.existingImages, ...form.imagePreviews];
   const totalImages = allImages.length;
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
-
     if (over && active.id !== over.id) {
       const oldIndex = allImages.findIndex((_, i) => `image-${i}` === active.id);
       const newIndex = allImages.findIndex((_, i) => `image-${i}` === over.id);
@@ -136,40 +140,68 @@ export default function AdminEditProductForm() {
           ← Back
         </span>
       </button>
-      <h1 className="text-2xl font-bold text-sky-900 mb-4">Edit Product</h1>
-      <form onSubmit={handleSubmit} className="space-y-4 max-w-md">
+      <h1 className="text-2xl font-bold text-sky-900 mb-6">Edit Product</h1>
+
+      <form onSubmit={handleSubmit} className="space-y-6 max-w-lg">
+        {/* Language tabs */}
         <div>
-          <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-            Product Name <span className="text-red-500">*</span>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Product Content <span className="text-gray-400 text-xs">(per language)</span>
           </label>
-          <input
-            id="name"
-            type="text"
-            name="name"
-            placeholder="Enter product name"
-            className="w-full border p-2 rounded"
-            value={form.name}
-            onChange={handleInputChange}
-            required
-            autoFocus
-          />
+          <div className="flex gap-1 mb-3 border-b border-gray-200">
+            {LOCALES.map((loc) => (
+              <button
+                key={loc.key}
+                type="button"
+                onClick={() => setActiveLocale(loc.key)}
+                className={`px-4 py-2 text-sm font-semibold rounded-t transition-colors ${
+                  activeLocale === loc.key
+                    ? 'bg-sky-900 text-white'
+                    : 'text-gray-600 hover:bg-gray-100'
+                }`}
+              >
+                {loc.label}
+                {loc.required && <span className="text-red-400 ml-0.5">*</span>}
+                {form.translations[loc.key].name && (
+                  <span className="ml-1.5 w-1.5 h-1.5 bg-green-400 rounded-full inline-block" />
+                )}
+              </button>
+            ))}
+          </div>
+
+          {LOCALES.map((loc) => (
+            <div key={loc.key} className={`space-y-3 ${activeLocale === loc.key ? '' : 'hidden'}`}>
+              <p className="text-xs text-gray-500">
+                {loc.fullLabel}
+                {loc.required ? ' — required' : ' — optional'}
+              </p>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Product Name {loc.required && <span className="text-red-500">*</span>}
+                </label>
+                <input
+                  type="text"
+                  placeholder={`Enter product name in ${loc.fullLabel}`}
+                  className="w-full border p-2 rounded focus:outline-none focus:ring-1 focus:ring-sky-500"
+                  value={form.translations[loc.key].name}
+                  onChange={(e) => handleTranslationChange(loc.key, 'name', e.target.value)}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                <textarea
+                  placeholder={`Enter description in ${loc.fullLabel}`}
+                  className="w-full border p-2 rounded focus:outline-none focus:ring-1 focus:ring-sky-500"
+                  rows={3}
+                  value={form.translations[loc.key].description}
+                  onChange={(e) => handleTranslationChange(loc.key, 'description', e.target.value)}
+                />
+              </div>
+            </div>
+          ))}
         </div>
 
-        <div>
-          <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
-            Description
-          </label>
-          <textarea
-            id="description"
-            name="description"
-            placeholder="Enter product description"
-            className="w-full border p-2 rounded"
-            rows={3}
-            value={form.description}
-            onChange={handleInputChange}
-          />
-        </div>
-
+        {/* Price */}
         <div>
           <label htmlFor="price" className="block text-sm font-medium text-gray-700 mb-1">
             Price <span className="text-red-500">*</span>
@@ -188,8 +220,9 @@ export default function AdminEditProductForm() {
           />
         </div>
 
+        {/* Discount */}
         <div className="space-y-2">
-          <label className="block text-sm font-medium text-gray-700 mb-1">Discount</label>
+          <label className="block text-sm font-medium text-gray-700">Discount</label>
           <label className="flex items-center gap-2">
             <input
               type="checkbox"
@@ -200,7 +233,6 @@ export default function AdminEditProductForm() {
             />
             <span className="text-sm font-medium">Has Discount</span>
           </label>
-
           {form.hasDiscount && (
             <div>
               <label
@@ -224,9 +256,10 @@ export default function AdminEditProductForm() {
           )}
         </div>
 
+        {/* Quantity */}
         <div>
           <label htmlFor="quantity" className="block text-sm font-medium text-gray-700 mb-1">
-            Quantity <span className="text-red-500">*</span>
+            Stock Quantity <span className="text-red-500">*</span>
           </label>
           <input
             id="quantity"
@@ -240,6 +273,7 @@ export default function AdminEditProductForm() {
           />
         </div>
 
+        {/* Category */}
         <div>
           <label htmlFor="categoryId" className="block text-sm font-medium text-gray-700 mb-1">
             Category <span className="text-red-500">*</span>
@@ -261,12 +295,12 @@ export default function AdminEditProductForm() {
           </select>
         </div>
 
+        {/* Images */}
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <label className="text-sm font-medium">Product Images (Max 8, 2MB each)</label>
             <p className="text-xs text-gray-500">{totalImages}/8 images</p>
           </div>
-
           {totalImages > 0 && (
             <div className="space-y-2">
               <p className="text-xs text-amber-600 flex items-center gap-1">
@@ -298,7 +332,6 @@ export default function AdminEditProductForm() {
               </DndContext>
             </div>
           )}
-
           <input
             ref={fileInputRef}
             type="file"
@@ -310,6 +343,7 @@ export default function AdminEditProductForm() {
           />
         </div>
 
+        {/* Actions */}
         <div className="flex gap-2">
           <button
             type="button"

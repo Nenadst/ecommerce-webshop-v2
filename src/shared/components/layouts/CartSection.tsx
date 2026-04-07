@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { CartIcon, HeartIcon, UserIcon } from '../icons';
-import Link from 'next/link';
+import { Link } from '@/i18n/navigation';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '../../contexts/AuthContext';
 import UserMenu from '../user/UserMenu';
@@ -11,8 +11,11 @@ import { useCart } from '../../contexts/CartContext';
 import { useCartDrawer } from '../../contexts/CartDrawerContext';
 import { Package } from 'lucide-react';
 import { AuthModal } from '../modals/AuthModal';
+import { useTranslations } from 'next-intl';
 
 const CartSection = () => {
+  const t = useTranslations('header');
+  const tAuth = useTranslations('auth');
   const { isAuthenticated, isAdmin } = useAuth();
   const pathname = usePathname();
   const { favorites, mounted } = useFavorites();
@@ -39,7 +42,7 @@ const CartSection = () => {
             href="/admin"
             className="w-32 h-10 justify-center items-center flex text-white text-sm font-normal mr-4 hover:bg-amber-600 cursor-pointer rounded-lg"
           >
-            Admin Panel
+            {t('adminPanel')}
           </Link>
         )}
 
@@ -51,7 +54,7 @@ const CartSection = () => {
             <div className="justify-center items-center flex">
               <UserIcon />
             </div>
-            <div className="text-white text-sm font-normal">Sign in</div>
+            <div className="text-white text-sm font-normal">{t('login')}</div>
           </Link>
         )}
         {isAuthenticated ? (
@@ -67,15 +70,11 @@ const CartSection = () => {
                 </div>
               </div>
             </div>
-            <div className="text-white text-sm font-normal">Wishlist</div>
+            <div className="text-white text-sm font-normal">{t('wishlist')}</div>
           </Link>
         ) : (
           <button
-            onClick={() =>
-              openAuthModal(
-                'You need to be signed in to use the wishlist feature. Please log in to your account or create a new one to start adding your favorite products!'
-              )
-            }
+            onClick={() => openAuthModal(tAuth('wishlistAuthMessage'))}
             className="w-32 h-10 justify-center items-center gap-3 flex hover:bg-amber-600 cursor-pointer rounded-lg"
           >
             <div className="justify-center items-center flex">
@@ -86,7 +85,7 @@ const CartSection = () => {
                 </div>
               </div>
             </div>
-            <div className="text-white text-sm font-normal">Wishlist</div>
+            <div className="text-white text-sm font-normal">{t('wishlist')}</div>
           </button>
         )}
         {isAuthenticated ? (
@@ -97,21 +96,17 @@ const CartSection = () => {
             <div className="justify-center items-center flex">
               <Package className="w-5 h-5 text-white" />
             </div>
-            <div className="text-white text-sm font-normal">Orders</div>
+            <div className="text-white text-sm font-normal">{t('orders')}</div>
           </Link>
         ) : (
           <button
-            onClick={() =>
-              openAuthModal(
-                'To track your order history, you need to be logged in. Please log in to your account or create a new one to view your orders!'
-              )
-            }
+            onClick={() => openAuthModal(t('ordersAuthMessage'))}
             className="w-32 h-10 justify-center items-center gap-3 flex hover:bg-amber-600 cursor-pointer rounded-lg"
           >
             <div className="justify-center items-center flex">
               <Package className="w-5 h-5 text-white" />
             </div>
-            <div className="text-white text-sm font-normal">Orders</div>
+            <div className="text-white text-sm font-normal">{t('orders')}</div>
           </button>
         )}
         <button
@@ -124,7 +119,7 @@ const CartSection = () => {
               <div className="text-white text-xs font-normal">{cartMounted ? itemCount : 0}</div>
             </div>
           </div>
-          <div className="text-white text-sm font-normal">Cart</div>
+          <div className="text-white text-sm font-normal">{t('cart')}</div>
         </button>
         {isAuthenticated && (
           <div className="ml-4 flex items-center relative z-[100]">

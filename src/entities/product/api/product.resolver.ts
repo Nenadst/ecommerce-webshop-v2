@@ -17,10 +17,17 @@ const getUserFromToken = (req: NextRequest): string | null => {
   }
 };
 
+type ProductTranslationInput = {
+  locale: string;
+  name: string;
+  description?: string;
+};
+
 type CreateProductInput = {
   input: {
-    name: string;
+    name?: string;
     description?: string;
+    translations?: ProductTranslationInput[];
     price: number;
     hasDiscount?: boolean;
     discountPrice?: number;
@@ -31,8 +38,9 @@ type CreateProductInput = {
 };
 
 type UpdateProductInput = {
-  name: string;
+  name?: string;
   description?: string;
+  translations?: ProductTranslationInput[];
   price: number;
   hasDiscount?: boolean;
   discountPrice?: number;
@@ -53,13 +61,51 @@ type ProductFilter = {
   maxPrice?: number;
 };
 
+type Context = {
+  req: NextRequest;
+  locale: string;
+};
+
+type ProductWithTranslations = {
+  id: string;
+  name: string;
+  description?: string | null;
+  translations?: Array<{ locale: string; name: string; description?: string | null }>;
+};
+
+/** Resolve name/description by locale, falling back to 'en' then the raw column */
+function resolveTranslated(
+  product: ProductWithTranslations,
+  field: 'name' | 'description',
+  locale: string
+): string | null {
+  const translations = product.translations ?? [];
+  const match =
+    translations.find((t) => t.locale === locale) ?? translations.find((t) => t.locale === 'en');
+  if (match) return match[field] ?? null;
+  // Fallback to the legacy column on the product itself
+  return product[field] ?? null;
+}
+
+const PRODUCT_INCLUDE = {
+  category: true,
+  translations: true,
+} as const;
+
 const productResolvers = {
+  // Field-level resolvers — called after any Query returns a Product
+  Product: {
+    name: (parent: ProductWithTranslations, _args: unknown, context: Context) =>
+      resolveTranslated(parent, 'name', context.locale) ?? '',
+    description: (parent: ProductWithTranslations, _args: unknown, context: Context) =>
+      resolveTranslated(parent, 'description', context.locale),
+    translations: (parent: ProductWithTranslations) => parent.translations ?? [],
+  },
+
   Query: {
-    userFavorites: async (_: unknown, __: unknown, context: { req: NextRequest }) => {
+    userFavorites: async (_: unknown, __: unknown, context: Context) => {
       const userId = getUserFromToken(context.req);
-      if (!userId) {
-        return [];
-      }
+      if (!userId) return [];
 
       const favorites = await prisma.userFavorite.findMany({
         where: { userId },
@@ -69,11 +115,9 @@ const productResolvers = {
       return favorites.map((fav) => fav.productId);
     },
 
-    favoriteProducts: async (_: unknown, __: unknown, context: { req: NextRequest }) => {
+    favoriteProducts: async (_: unknown, __: unknown, context: Context) => {
       const userId = getUserFromToken(context.req);
-      if (!userId) {
-        return [];
-      }
+      if (!userId) return [];
 
       const favorites = await prisma.userFavorite.findMany({
         where: { userId },
@@ -81,24 +125,13 @@ const productResolvers = {
       });
 
       const productIds = favorites.map((fav) => fav.productId);
+      if (productIds.length === 0) return [];
 
-      if (productIds.length === 0) {
-        return [];
-      }
-
-      const products = await prisma.product.findMany({
-        where: {
-          id: { in: productIds },
-        },
-        include: {
-          category: true,
-        },
-        orderBy: {
-          createdAt: 'desc',
-        },
+      return prisma.product.findMany({
+        where: { id: { in: productIds } },
+        include: PRODUCT_INCLUDE,
+        orderBy: { createdAt: 'desc' },
       });
-
-      return products;
     },
 
     products: async (
@@ -118,16 +151,19 @@ const productResolvers = {
       const where: Record<string, unknown> = {};
 
       if (filter.name) {
-        where.name = {
-          contains: filter.name,
-          mode: 'insensitive',
-        };
+        // Search across translations AND the legacy name column
+        where.OR = [
+          { name: { contains: filter.name, mode: 'insensitive' } },
+          {
+            translations: {
+              some: { name: { contains: filter.name, mode: 'insensitive' } },
+            },
+          },
+        ];
       }
 
       if (filter.categoryIds && filter.categoryIds.length > 0) {
-        where.categoryId = {
-          in: filter.categoryIds,
-        };
+        where.categoryId = { in: filter.categoryIds };
       } else if (filter.categoryId) {
         where.categoryId = filter.categoryId;
       }
@@ -140,67 +176,67 @@ const productResolvers = {
       }
 
       const skip = (page - 1) * limit;
-      const orderBy = {
-        [sort.field]: sort.order === 1 ? 'asc' : 'desc',
-      };
+      const orderBy = { [sort.field]: sort.order === 1 ? 'asc' : 'desc' };
 
       const [items, total] = await Promise.all([
-        prisma.product.findMany({
-          where,
-          orderBy,
-          skip,
-          take: limit,
-          include: {
-            category: true,
-          },
-        }),
+        prisma.product.findMany({ where, orderBy, skip, take: limit, include: PRODUCT_INCLUDE }),
         prisma.product.count({ where }),
       ]);
 
-      return {
-        items,
-        total,
-        page,
-        totalPages: Math.ceil(total / limit),
-      };
+      return { items, total, page, totalPages: Math.ceil(total / limit) };
     },
 
     product: async (_: unknown, { id }: { id: string }) => {
-      return await prisma.product.findUnique({
-        where: { id },
-        include: {
-          category: true,
-        },
-      });
+      return prisma.product.findUnique({ where: { id }, include: PRODUCT_INCLUDE });
     },
 
     productsByIds: async (_: unknown, { ids }: { ids: string[] }) => {
-      if (!ids || ids.length === 0) {
-        return [];
-      }
-
-      return await prisma.product.findMany({
-        where: {
-          id: { in: ids },
-        },
-        include: {
-          category: true,
-        },
+      if (!ids || ids.length === 0) return [];
+      return prisma.product.findMany({
+        where: { id: { in: ids } },
+        include: PRODUCT_INCLUDE,
       });
     },
   },
 
   Mutation: {
     createProduct: async (_: unknown, args: CreateProductInput) => {
+      const { translations, name, description, ...rest } = args.input;
+
+      // Derive a canonical English name for the legacy column (required for backward-compat)
+      const enTranslation = translations?.find((t) => t.locale === 'en');
+      const canonicalName = enTranslation?.name ?? name ?? '';
+      const canonicalDescription = enTranslation?.description ?? description;
+
       const product = await prisma.product.create({
         data: {
-          ...args.input,
-          hasDiscount: args.input.hasDiscount || false,
-          images: args.input.images || [],
+          ...rest,
+          name: canonicalName,
+          description: canonicalDescription,
+          hasDiscount: rest.hasDiscount ?? false,
+          images: rest.images ?? [],
+          translations: translations?.length
+            ? {
+                create: translations.map((t) => ({
+                  locale: t.locale,
+                  name: t.name,
+                  description: t.description,
+                })),
+              }
+            : // Auto-create an 'en' translation from the legacy fields if no translations provided
+              canonicalName
+              ? {
+                  create: [
+                    {
+                      locale: 'en',
+                      name: canonicalName,
+                      description: canonicalDescription,
+                    },
+                  ],
+                }
+              : undefined,
         },
-        include: {
-          category: true,
-        },
+        include: PRODUCT_INCLUDE,
       });
 
       return product;
@@ -208,95 +244,85 @@ const productResolvers = {
 
     deleteProduct: async (_: unknown, { id }: DeleteProductArgs) => {
       try {
-        // Check if product exists in any cart
-        const cartItems = await prisma.cartItem.findFirst({
-          where: { productId: id },
-        });
-
+        const cartItems = await prisma.cartItem.findFirst({ where: { productId: id } });
         if (cartItems) {
           throw new Error(
-            'Cannot delete this product because it is currently in one or more shopping carts. Please wait for customers to remove it from their carts or remove it manually.'
+            'Cannot delete this product because it is currently in one or more shopping carts.'
           );
         }
 
-        // Check if product exists in any order
-        const orderItems = await prisma.orderItem.findFirst({
-          where: { productId: id },
-        });
-
+        const orderItems = await prisma.orderItem.findFirst({ where: { productId: id } });
         if (orderItems) {
-          throw new Error(
-            'Cannot delete this product because it exists in order history. Products that have been ordered cannot be deleted to preserve order records.'
-          );
+          throw new Error('Cannot delete this product because it exists in order history.');
         }
 
-        // If no conflicts, proceed with deletion
-        await prisma.product.delete({
-          where: { id },
-        });
+        await prisma.product.delete({ where: { id } });
         return true;
       } catch (error: unknown) {
         console.error('Failed to delete product:', error);
-
-        // If it's already a thrown error with our custom message, re-throw it
         if (error instanceof Error && error.message.includes('Cannot delete this product')) {
           throw error;
         }
-
-        // Check if it's a foreign key constraint error (as a fallback)
         if (error && typeof error === 'object' && 'code' in error && error.code === 'P2003') {
-          throw new Error(
-            'Cannot delete this product because it is being referenced by other records in the database.'
-          );
+          throw new Error('Cannot delete this product because it is referenced by other records.');
         }
-
         throw new Error('Failed to delete product');
       }
     },
 
     updateProduct: async (_: unknown, { id, input }: { id: string; input: UpdateProductInput }) => {
+      const { translations, name, description, ...rest } = input;
+
+      const enTranslation = translations?.find((t) => t.locale === 'en');
+      const canonicalName = enTranslation?.name ?? name;
+      const canonicalDescription = enTranslation?.description ?? description;
+
+      const updateData: Record<string, unknown> = { ...rest };
+      if (canonicalName !== undefined) updateData.name = canonicalName;
+      if (canonicalDescription !== undefined) updateData.description = canonicalDescription;
+
+      // Upsert each translation
+      if (translations?.length) {
+        await Promise.all(
+          translations
+            .filter((t) => t.name.trim())
+            .map((t) =>
+              prisma.productTranslation.upsert({
+                where: { productId_locale: { productId: id, locale: t.locale } },
+                update: { name: t.name, description: t.description },
+                create: {
+                  productId: id,
+                  locale: t.locale,
+                  name: t.name,
+                  description: t.description,
+                },
+              })
+            )
+        );
+      }
+
       const updated = await prisma.product.update({
         where: { id },
-        data: input,
-        include: {
-          category: true,
-        },
+        data: updateData,
+        include: PRODUCT_INCLUDE,
       });
 
       return updated;
     },
 
-    toggleFavorite: async (
-      _: unknown,
-      { productId }: { productId: string },
-      context: { req: NextRequest }
-    ) => {
+    toggleFavorite: async (_: unknown, { productId }: { productId: string }, context: Context) => {
       const userId = getUserFromToken(context.req);
-      if (!userId) {
-        throw new Error('Authentication required');
-      }
+      if (!userId) throw new Error('Authentication required');
 
       const existing = await prisma.userFavorite.findUnique({
-        where: {
-          userId_productId: {
-            userId,
-            productId,
-          },
-        },
+        where: { userId_productId: { userId, productId } },
       });
 
       if (existing) {
-        await prisma.userFavorite.delete({
-          where: { id: existing.id },
-        });
+        await prisma.userFavorite.delete({ where: { id: existing.id } });
         return false;
       } else {
-        await prisma.userFavorite.create({
-          data: {
-            userId,
-            productId,
-          },
-        });
+        await prisma.userFavorite.create({ data: { userId, productId } });
         return true;
       }
     },

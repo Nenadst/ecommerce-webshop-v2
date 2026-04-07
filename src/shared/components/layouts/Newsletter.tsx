@@ -2,8 +2,10 @@
 
 import React, { useState } from 'react';
 import { HeadphonesIcon } from '../icons';
+import { useTranslations } from 'next-intl';
 
 const Newsletter = () => {
+  const t = useTranslations('newsletter');
   const [email, setEmail] = useState('');
 
   return (
@@ -13,12 +15,10 @@ const Newsletter = () => {
           {/* Left — headline */}
           <div className="text-center lg:text-left flex-shrink-0">
             <p className="text-amber-400 text-sm font-semibold uppercase tracking-widest mb-2">
-              Newsletter
+              {t('label')}
             </p>
-            <h2 className="text-white text-2xl md:text-3xl font-bold mb-1">Stay in the Loop</h2>
-            <p className="text-slate-400 text-sm">
-              Get exclusive deals and the latest updates delivered to your inbox.
-            </p>
+            <h2 className="text-white text-2xl md:text-3xl font-bold mb-1">{t('headline')}</h2>
+            <p className="text-slate-400 text-sm">{t('subtitle')}</p>
           </div>
 
           {/* Center — email input */}
@@ -43,16 +43,16 @@ const Newsletter = () => {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your email address"
+                placeholder={t('placeholder')}
                 className="w-full h-full pl-11 pr-2 bg-transparent text-white placeholder-slate-500 text-sm focus:outline-none rounded-2xl"
               />
               <div className="flex items-center pr-1.5 flex-shrink-0">
                 <button className="px-5 h-9 bg-amber-500 hover:bg-amber-400 text-white text-sm font-semibold rounded-xl transition-colors shadow-sm shadow-amber-500/30">
-                  Subscribe
+                  {t('subscribe')}
                 </button>
               </div>
             </div>
-            <p className="text-slate-500 text-xs mt-2 pl-1">No spam, unsubscribe at any time.</p>
+            <p className="text-slate-500 text-xs mt-2 pl-1">{t('noSpam')}</p>
           </div>
 
           {/* Right — phone */}
@@ -61,8 +61,8 @@ const Newsletter = () => {
               <HeadphonesIcon />
             </div>
             <div>
-              <div className="text-slate-400 text-xs mb-0.5">Call us 24/7</div>
-              <div className="text-white text-base font-semibold">(+62) 0123 567 789</div>
+              <div className="text-slate-400 text-xs mb-0.5">{t('callUs')}</div>
+              <div className="text-white text-base font-semibold">{t('phone')}</div>
             </div>
           </div>
         </div>

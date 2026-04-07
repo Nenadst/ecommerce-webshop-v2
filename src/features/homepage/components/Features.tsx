@@ -1,25 +1,18 @@
+'use client';
+
 import { BestQualityIcon, FreeDeliveryIcon, WarrantyIcon } from '@/shared/components/icons';
 import React from 'react';
-
-const features = [
-  {
-    icon: <FreeDeliveryIcon />,
-    title: 'Free Delivery',
-    desc: 'On orders above $50',
-  },
-  {
-    icon: <BestQualityIcon />,
-    title: 'Best Quality',
-    desc: 'Premium products, low prices',
-  },
-  {
-    icon: <WarrantyIcon />,
-    title: '1 Year Warranty',
-    desc: 'Full coverage on all items',
-  },
-];
+import { useTranslations } from 'next-intl';
 
 const Features = () => {
+  const t = useTranslations('features');
+
+  const features = [
+    { icon: <FreeDeliveryIcon />, title: t('freeDelivery'), desc: t('freeDeliveryDesc') },
+    { icon: <BestQualityIcon />, title: t('bestQuality'), desc: t('bestQualityDesc') },
+    { icon: <WarrantyIcon />, title: t('warranty'), desc: t('warrantyDesc') },
+  ];
+
   return (
     <section className="container mx-auto px-4 py-6">
       <div className="bg-gradient-to-r from-slate-900 to-slate-800 rounded-3xl p-8 md:p-10">

@@ -40,23 +40,39 @@ model Category {
 }
 
 model Product {
-  id            String         @id @default(cuid())
-  name          String
-  description   String?
+  id            String               @id @default(cuid())
+  name          String               // kept as English fallback for legacy compatibility
+  description   String?              // kept as English fallback for legacy compatibility
   price         Float
-  hasDiscount   Boolean        @default(false)
+  hasDiscount   Boolean              @default(false)
   discountPrice Float?
   quantity      Int
-  images        String[]       @default([])
+  images        String[]             @default([])
   categoryId    String
-  category      Category       @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  category      Category             @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  translations  ProductTranslation[]
   favorites     UserFavorite[]
   cartItems     CartItem[]
   orderItems    OrderItem[]
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
 
   @@map("products")
+}
+
+model ProductTranslation {
+  id          String   @id @default(cuid())
+  productId   String
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  locale      String   // 'en', 'fr', 'nl'
+  name        String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([productId, locale])
+  @@index([productId])
+  @@map("product_translations")
 }
 
 model UserFavorite {

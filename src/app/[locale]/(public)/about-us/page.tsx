@@ -1,11 +1,7 @@
-import React from 'react';
+'use client';
 
-const stats = [
-  { value: '10K+', label: 'Happy Customers' },
-  { value: '5K+', label: 'Products' },
-  { value: '99%', label: 'Satisfaction Rate' },
-  { value: '24/7', label: 'Support' },
-];
+import React from 'react';
+import { useTranslations } from 'next-intl';
 
 const values = [
   {
@@ -24,8 +20,8 @@ const values = [
         />
       </svg>
     ),
-    title: 'Quality First',
-    desc: 'Every product is carefully selected and tested to meet our high standards before reaching you.',
+    titleKey: 'v5Title',
+    descKey: 'v5Desc',
   },
   {
     icon: (
@@ -43,8 +39,8 @@ const values = [
         />
       </svg>
     ),
-    title: 'Fast Delivery',
-    desc: 'We partner with reliable couriers to ensure your orders arrive quickly and in perfect condition.',
+    titleKey: 'v6Title',
+    descKey: 'v6Desc',
   },
   {
     icon: (
@@ -62,8 +58,8 @@ const values = [
         />
       </svg>
     ),
-    title: 'Secure Shopping',
-    desc: 'Your data and payments are protected with industry-leading security and encryption.',
+    titleKey: 'v7Title',
+    descKey: 'v7Desc',
   },
   {
     icon: (
@@ -81,12 +77,24 @@ const values = [
         />
       </svg>
     ),
-    title: 'Customer Support',
-    desc: 'Our dedicated support team is available around the clock to help you with any questions.',
+    titleKey: 'v8Title',
+    descKey: 'v8Desc',
   },
 ];
 
 const AboutUsPage = () => {
+  const t = useTranslations('aboutUs');
+  const valuesTranslated = values.map((v) => ({
+    ...v,
+    title: t(v.titleKey as 'v5Title' | 'v6Title' | 'v7Title' | 'v8Title'),
+    desc: t(v.descKey as 'v5Desc' | 'v6Desc' | 'v7Desc' | 'v8Desc'),
+  }));
+  const stats = [
+    { value: '10K+', label: t('statsHappyCustomers') },
+    { value: '5K+', label: t('statsProducts') },
+    { value: '99%', label: t('statsSatisfaction') },
+    { value: '24/7', label: t('statsSupport') },
+  ];
   return (
     <div className="bg-slate-50 min-h-screen">
       {/* Hero */}
@@ -98,15 +106,12 @@ const AboutUsPage = () => {
         <div className="container mx-auto px-4 lg:px-16 py-20 relative">
           <div className="max-w-2xl">
             <p className="text-amber-400 text-sm font-semibold uppercase tracking-widest mb-3">
-              About Us
+              {t('heroLabel')}
             </p>
             <h1 className="text-white text-4xl md:text-5xl font-bold leading-tight mb-4">
-              We Make Premium Electronics <span className="text-amber-400">Accessible</span>
+              {t('heroTitle')} <span className="text-amber-400">{t('heroHighlight')}</span>
             </h1>
-            <p className="text-slate-400 text-lg leading-relaxed">
-              Founded with a passion for technology, WebShop is your trusted destination for premium
-              electronics at competitive prices — backed by exceptional service.
-            </p>
+            <p className="text-slate-400 text-lg leading-relaxed">{t('heroDesc')}</p>
           </div>
         </div>
       </div>
@@ -131,26 +136,13 @@ const AboutUsPage = () => {
         <div className="bg-white rounded-3xl border border-slate-100 p-8 md:p-12">
           <div className="max-w-3xl">
             <p className="text-amber-500 text-sm font-semibold uppercase tracking-widest mb-3">
-              Our Story
+              {t('storyLabel')}
             </p>
-            <h2 className="text-slate-900 text-3xl font-bold mb-6">
-              Built for People Who Love Tech
-            </h2>
+            <h2 className="text-slate-900 text-3xl font-bold mb-6">{t('storyHeadline')}</h2>
             <div className="space-y-4 text-slate-600 leading-relaxed">
-              <p>
-                WebShop was born from a simple idea: everyone deserves access to high-quality
-                electronics without the hassle of complicated shopping experiences or inflated
-                prices.
-              </p>
-              <p>
-                We curate our catalog carefully, working directly with manufacturers and trusted
-                distributors to bring you the best products across cameras, laptops, smartphones,
-                speakers, and accessories.
-              </p>
-              <p>
-                Every order we ship represents our commitment to quality, transparency, and the
-                belief that great technology should be within everyone&apos;s reach.
-              </p>
+              <p>{t('storyP1')}</p>
+              <p>{t('storyP2')}</p>
+              <p>{t('storyP3')}</p>
             </div>
           </div>
         </div>
@@ -160,12 +152,12 @@ const AboutUsPage = () => {
       <div className="container mx-auto px-4 lg:px-16 pb-16">
         <div className="text-center mb-10">
           <p className="text-amber-500 text-sm font-semibold uppercase tracking-widest mb-2">
-            Why Choose Us
+            {t('whyChooseLabel')}
           </p>
-          <h2 className="text-slate-900 text-3xl font-bold">What We Stand For</h2>
+          <h2 className="text-slate-900 text-3xl font-bold">{t('whyChooseTitle')}</h2>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          {values.map((v) => (
+          {valuesTranslated.map((v) => (
             <div
               key={v.title}
               className="bg-white rounded-2xl border border-slate-100 p-6 flex gap-5 hover:border-amber-200 hover:shadow-sm transition-all"

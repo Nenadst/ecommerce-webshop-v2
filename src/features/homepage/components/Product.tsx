@@ -2,7 +2,7 @@
 
 import DotSlide from '@/shared/components/elements/DotSlide';
 import Star from '@/shared/components/elements/Star';
-import Link from 'next/link';
+import { Link } from '@/i18n/navigation';
 import React from 'react';
 import Image from 'next/image';
 

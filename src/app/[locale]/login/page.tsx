@@ -1,12 +1,14 @@
 'use client';
 
 import { useState, useEffect, Suspense } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import Link from 'next/link';
+import { useRouter } from '@/i18n/navigation';
+import { useSearchParams } from 'next/navigation';
+import { Link } from '@/i18n/navigation';
 import Image from 'next/image';
 import { useAuth } from '@/shared/contexts/AuthContext';
 import { useAuthMutations } from '@/shared/hooks/useAuthMutations';
 import { ArrowLeft } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 function LoginForm() {
   const router = useRouter();
@@ -14,6 +16,7 @@ function LoginForm() {
   const returnUrl = searchParams.get('returnUrl') || '/';
   const { isAuthenticated } = useAuth();
   const { login, error, setError, isLoading } = useAuthMutations();
+  const t = useTranslations('auth');
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -29,7 +32,7 @@ function LoginForm() {
     e.preventDefault();
     setError('');
     if (!email || !password) {
-      setError('Please fill in all fields');
+      setError(t('fillAllFields'));
       return;
     }
     await login({ email, password });
@@ -130,13 +133,13 @@ function LoginForm() {
             className="inline-flex items-center gap-2 text-slate-400 hover:text-slate-700 transition-colors text-sm mb-10 group"
           >
             <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-0.5" />
-            Back
+            {t('back')}
           </Link>
 
           {/* Header */}
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-slate-900 mb-2">Welcome back</h1>
-            <p className="text-slate-500">Sign in to your account to continue</p>
+            <h1 className="text-3xl font-bold text-slate-900 mb-2">{t('welcomeBack')}</h1>
+            <p className="text-slate-500">{t('signInToContinue')}</p>
           </div>
 
           {/* Error */}
@@ -164,7 +167,7 @@ function LoginForm() {
             {/* Email */}
             <div>
               <label className="block text-sm font-semibold text-slate-700 mb-2">
-                Email address
+                {t('emailAddress')}
               </label>
               <div className="relative">
                 <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
@@ -179,7 +182,7 @@ function LoginForm() {
                 </div>
                 <input
                   type="email"
-                  placeholder="you@example.com"
+                  placeholder={t('emailPlaceholder')}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   autoFocus
@@ -191,7 +194,9 @@ function LoginForm() {
             {/* Password */}
             <div>
               <div className="flex items-center justify-between mb-2">
-                <label className="block text-sm font-semibold text-slate-700">Password</label>
+                <label className="block text-sm font-semibold text-slate-700">
+                  {t('password')}
+                </label>
                 <a
                   href="#"
                   className="text-xs text-amber-500 hover:text-amber-600 font-medium transition-colors"
@@ -212,7 +217,7 @@ function LoginForm() {
                 </div>
                 <input
                   type={showPassword ? 'text' : 'password'}
-                  placeholder="Enter your password"
+                  placeholder={t('enterPassword')}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full bg-slate-50 border border-slate-200 text-slate-900 placeholder-slate-400 rounded-xl pl-11 pr-12 py-3.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
@@ -275,10 +280,10 @@ function LoginForm() {
                       d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
                     />
                   </svg>
-                  Signing in...
+                  {t('signingIn')}
                 </span>
               ) : (
-                'Sign In'
+                t('signInBtn')
               )}
             </button>
           </form>
@@ -286,14 +291,14 @@ function LoginForm() {
           {/* Divider */}
           <div className="flex items-center gap-4 my-7">
             <div className="flex-1 h-px bg-slate-100" />
-            <span className="text-slate-400 text-xs font-medium">New to WebShop?</span>
+            <span className="text-slate-400 text-xs font-medium">{t('newToWebShop')}</span>
             <div className="flex-1 h-px bg-slate-100" />
           </div>
 
           {/* Register CTA */}
           <Link href={`/register?returnUrl=${encodeURIComponent(returnUrl)}`}>
             <button className="w-full py-4 border-2 border-slate-200 hover:border-amber-400 text-slate-700 hover:text-amber-500 font-semibold rounded-xl transition-all text-sm">
-              Create an account
+              {t('createAccount')}
             </button>
           </Link>
         </div>

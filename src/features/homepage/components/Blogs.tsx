@@ -2,14 +2,16 @@ import React from 'react';
 import { BLOGS } from '@/data/blogs';
 import { Card } from '@/shared/components/elements/Card';
 import DotSlide from '@/shared/components/elements/DotSlide';
+import { useTranslations } from 'next-intl';
 
 const Blogs = () => {
+  const t = useTranslations('homepage');
   return (
     <div className="container mx-auto">
       <div className="w-11/12 h-9 gap-96 flex flex-wrap justify-between m-auto p-10 mb-5">
-        <div className="text-cyan-800 text-2xl font-semibold">Latest news</div>
+        <div className="text-cyan-800 text-2xl font-semibold">{t('latestNews')}</div>
         <div className="text-cyan-800 text-xl font-medium cursor-pointer hover:text-blue-500">
-          View all
+          {t('viewAll')}
         </div>
       </div>
       <div className="flex flex-wrap m-auto gap-5 justify-center mb-5">
@@ -30,7 +32,9 @@ const Blogs = () => {
                     {blog.description}
                   </div>
                 </div>
-                <div className="text-sky-900 text-sm font-normal">By {blog.author}</div>
+                <div className="text-sky-900 text-sm font-normal">
+                  {t('byAuthor', { author: blog.author })}
+                </div>
               </div>
             </div>
           </Card>

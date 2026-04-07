@@ -2,13 +2,15 @@
 
 import React, { useEffect } from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
+import { Link } from '@/i18n/navigation';
 import { useCart } from '@/shared/contexts/CartContext';
 import { useCartDrawer } from '@/shared/contexts/CartDrawerContext';
 import Button from '@/shared/components/elements/Button';
 import Spinner from '@/shared/components/spinner/Spinner';
+import { useTranslations } from 'next-intl';
 
 const CartDrawer = () => {
+  const t = useTranslations('cart');
   const { isOpen, closeDrawer } = useCartDrawer();
   const { cartItems, total, itemCount, updateQuantity, removeFromCart, loading, mounted } =
     useCart();
@@ -62,9 +64,11 @@ const CartDrawer = () => {
               />
             </svg>
             <div>
-              <h2 className="text-lg font-bold">Shopping Cart</h2>
+              <h2 className="text-lg font-bold">{t('title')}</h2>
               <p className="text-xs text-sky-100">
-                {itemCount} {itemCount === 1 ? 'item' : 'items'}
+                {itemCount === 1
+                  ? t('item', { count: itemCount })
+                  : t('items', { count: itemCount })}
               </p>
             </div>
           </div>
@@ -106,11 +110,11 @@ const CartDrawer = () => {
                   />
                 </svg>
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Your cart is empty</h3>
-              <p className="text-sm text-gray-600 mb-4">Add some products to get started!</p>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">{t('empty')}</h3>
+              <p className="text-sm text-gray-600 mb-4">{t('emptySubtitle')}</p>
               <Link href="/products" onClick={closeDrawer}>
                 <Button className="bg-amber-500 hover:bg-amber-600 text-white px-6 py-2 rounded-lg text-sm">
-                  Start Shopping
+                  {t('startShopping')}
                 </Button>
               </Link>
             </div>
@@ -230,24 +234,24 @@ const CartDrawer = () => {
         {cartItems.length > 0 && (
           <div className="border-t border-gray-200 px-6 py-4 bg-gray-50">
             <div className="flex justify-between items-center mb-4">
-              <span className="text-lg font-semibold text-gray-900">Subtotal:</span>
+              <span className="text-lg font-semibold text-gray-900">{t('subtotal')}:</span>
               <span className="text-2xl font-bold text-sky-900">€{total.toFixed(2)}</span>
             </div>
 
             <div className="space-y-2">
               <Link href="/cart" onClick={closeDrawer}>
                 <Button className="w-full bg-sky-900 hover:bg-sky-800 text-white py-3 rounded-lg font-semibold transition-colors">
-                  View Cart
+                  {t('viewCart')}
                 </Button>
               </Link>
               <Link href="/checkout" onClick={closeDrawer}>
                 <Button className="w-full bg-amber-500 hover:bg-amber-600 text-white py-3 mt-3 rounded-lg font-semibold transition-colors">
-                  Checkout
+                  {t('checkout')}
                 </Button>
               </Link>
             </div>
 
-            <p className="text-xs text-center text-gray-500 mt-3">Free shipping on all orders</p>
+            <p className="text-xs text-center text-gray-500 mt-3">{t('freeShippingNote')}</p>
           </div>
         )}
       </div>

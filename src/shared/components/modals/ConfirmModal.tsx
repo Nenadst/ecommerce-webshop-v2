@@ -2,6 +2,7 @@
 
 import React, { useEffect } from 'react';
 import Button from '../elements/Button';
+import { useTranslations } from 'next-intl';
 
 interface ConfirmModalProps {
   isOpen: boolean;
@@ -21,11 +22,12 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
   onConfirm,
   title,
   message,
-  confirmText = 'Confirm',
-  cancelText = 'Cancel',
+  confirmText,
+  cancelText,
   confirmButtonClass = 'bg-red-600 hover:bg-red-700',
   isLoading = false,
 }) => {
+  const t = useTranslations('common');
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
@@ -95,14 +97,14 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
                 disabled={isLoading}
                 className="px-6 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg font-medium transition-colors disabled:opacity-50"
               >
-                {cancelText}
+                {cancelText ?? t('cancel')}
               </Button>
               <Button
                 onClick={onConfirm}
                 disabled={isLoading}
                 className={`px-6 py-2 text-white rounded-lg font-medium transition-colors disabled:opacity-50 ${confirmButtonClass}`}
               >
-                {isLoading ? 'Processing...' : confirmText}
+                {isLoading ? t('processing') : (confirmText ?? t('confirm'))}
               </Button>
             </div>
           </div>

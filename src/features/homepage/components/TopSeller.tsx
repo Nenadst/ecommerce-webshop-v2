@@ -1,29 +1,34 @@
+'use client';
+
 import Star from '@/shared/components/elements/Star';
 import { ShoppingCartIcon, EyeIcon } from '@/shared/components/icons';
 import React from 'react';
-
-const sideProducts = [
-  {
-    title: 'Gaming Setup',
-    price: '$299.00',
-    image: '/assets/img/ps4c.png',
-  },
-  {
-    title: 'Premium Laptop',
-    price: '$899.00',
-    image: '/assets/img/5-1.png',
-  },
-];
+import { useTranslations } from 'next-intl';
 
 const TopSeller = () => {
+  const t = useTranslations('homepage');
+
+  const sideProducts = [
+    {
+      title: t('gamingSetup'),
+      price: '$299.00',
+      image: '/assets/img/ps4c.png',
+    },
+    {
+      title: t('premiumLaptop'),
+      price: '$899.00',
+      image: '/assets/img/5-1.png',
+    },
+  ];
+
   return (
     <section className="container mx-auto px-4 py-8">
       <div className="flex items-center justify-between mb-6">
         <div>
           <p className="text-amber-500 text-sm font-semibold uppercase tracking-widest mb-1">
-            Trending Now
+            {t('trendingNow')}
           </p>
-          <h2 className="text-slate-900 text-2xl md:text-3xl font-bold">Top Sellers</h2>
+          <h2 className="text-slate-900 text-2xl md:text-3xl font-bold">{t('topSellers')}</h2>
         </div>
       </div>
 
@@ -45,10 +50,10 @@ const TopSeller = () => {
           {/* Product details */}
           <div className="relative z-10 flex-1 text-center md:text-left">
             <div className="inline-flex px-3 py-1 bg-amber-500/20 text-amber-400 text-xs font-semibold rounded-full mb-4 border border-amber-500/30">
-              BEST SELLER
+              {t('bestSeller')}
             </div>
-            <h3 className="text-white text-xl md:text-2xl font-bold mb-1">JBL Bar 2.1 Deep Bass</h3>
-            <p className="text-slate-400 text-sm mb-3">Premium audio experience for your home</p>
+            <h3 className="text-white text-xl md:text-2xl font-bold mb-1">{t('jblBarName')}</h3>
+            <p className="text-slate-400 text-sm mb-3">{t('jblBarDesc')}</p>
             <div className="text-amber-400 text-2xl font-bold mb-2">$11.70</div>
             <div className="mb-5">
               <Star count={5} />
@@ -57,10 +62,10 @@ const TopSeller = () => {
             {/* Countdown */}
             <div className="flex justify-center md:justify-start gap-3 mb-7">
               {[
-                { v: '57', l: 'Days' },
-                { v: '11', l: 'Hrs' },
-                { v: '33', l: 'Min' },
-                { v: '59', l: 'Sec' },
+                { v: '57', l: t('days') },
+                { v: '11', l: t('hrs') },
+                { v: '33', l: t('min') },
+                { v: '59', l: t('sec') },
               ].map(({ v, l }) => (
                 <div
                   key={l}
@@ -77,9 +82,9 @@ const TopSeller = () => {
                 <div className="w-5 h-5">
                   <ShoppingCartIcon />
                 </div>
-                Add to Cart
+                {t('addToCart')}
               </button>
-              <button className="w-11 h-11 bg-slate-700 hover:bg-slate-600 transition-colors rounded-2xl flex items-center justify-center text-slate-300">
+              <button className="w-11 h-11 bg-slate-700 hover:bg-slate-600 transition-colors rounded-2xl flex items-center justify-center text-white">
                 <div className="w-5 h-5">
                   <EyeIcon />
                 </div>

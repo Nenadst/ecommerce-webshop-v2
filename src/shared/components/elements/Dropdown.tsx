@@ -3,6 +3,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { cn } from '@/shared/utils/cn';
 import { DropdownProps, DropdownItem } from './types/dropdown.types';
+import { useRouter } from '@/i18n/navigation';
+import { useTranslations } from 'next-intl';
 
 export const Dropdown: React.FC<DropdownProps> = ({
   trigger,
@@ -17,6 +19,8 @@ export const Dropdown: React.FC<DropdownProps> = ({
   openOnHover = false,
   showSearch = false,
 }) => {
+  const router = useRouter();
+  const t = useTranslations('navigation');
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -101,7 +105,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
       item.onClick();
     }
     if (item.href) {
-      window.location.href = item.href;
+      router.push(item.href);
     }
     setIsOpen(false);
   };
@@ -144,7 +148,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
               <div className="relative">
                 <input
                   type="text"
-                  placeholder="Search categories..."
+                  placeholder={t('searchCategoriesPlaceholder')}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full pl-9 pr-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent placeholder-slate-400"
@@ -180,18 +184,18 @@ export const Dropdown: React.FC<DropdownProps> = ({
                   style={{ animationDelay: '0.2s' }}
                 />
               </div>
-              <p className="text-slate-400 text-xs">Loading categories...</p>
+              <p className="text-slate-400 text-xs">{t('loadingCategories')}</p>
             </div>
           ) : filteredItems.length === 0 ? (
             <div className="px-4 py-10 text-sm text-slate-400 text-center">
-              {searchTerm ? `No results for "${searchTerm}"` : emptyMessage}
+              {searchTerm ? t('noResultsFor', { term: searchTerm }) : emptyMessage}
             </div>
           ) : (
             <>
               {/* Header row */}
               <div className="px-4 pt-3 pb-1.5 flex items-center justify-between">
                 <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                  Categories
+                  {t('categoriesHeader')}
                 </span>
                 {showSearch && searchTerm && (
                   <span className="text-xs text-slate-400">{filteredItems.length} found</span>
@@ -256,7 +260,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
                 }
                 className="w-full text-xs font-semibold text-amber-500 hover:text-amber-600 transition-colors text-center"
               >
-                View all products →
+                {t('viewAllProductsLink')}
               </button>
             </div>
           )}

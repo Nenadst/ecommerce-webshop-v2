@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useMemo } from 'react';
+import { useTranslations } from 'next-intl';
 
 interface Category {
   id: string;
@@ -26,6 +27,7 @@ const SideCategories = ({
   onCategoriesChange,
   allProducts = [],
 }: SideCategoriesProps) => {
+  const t = useTranslations('products');
   const categories = useMemo(() => {
     const uniqueCategories = new Map<string, Category>();
     allProducts.forEach((product) => {
@@ -54,13 +56,15 @@ const SideCategories = ({
   return (
     <div className="bg-white rounded-2xl border border-slate-100 p-5">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-slate-900 font-bold text-sm uppercase tracking-wider">Categories</h3>
+        <h3 className="text-slate-900 font-bold text-sm uppercase tracking-wider">
+          {t('categories')}
+        </h3>
         {selectedCategories.length > 0 && (
           <button
             onClick={() => onCategoriesChange([])}
             className="text-amber-500 text-xs font-medium hover:text-amber-600 transition-colors"
           >
-            Clear
+            {t('clearFilter')}
           </button>
         )}
       </div>
@@ -74,7 +78,7 @@ const SideCategories = ({
               : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
           }`}
         >
-          <span>All Categories</span>
+          <span>{t('allCategories')}</span>
           <span
             className={`text-xs font-medium px-1.5 py-0.5 rounded-full ${
               selectedCategories.length === 0

@@ -1,5 +1,8 @@
+'use client';
+
 import React from 'react';
-import Link from 'next/link';
+import { Link } from '@/i18n/navigation';
+import { useTranslations } from 'next-intl';
 
 const categories = [
   { name: 'Cameras', icon: '📷', desc: 'DSLR, mirrorless & action cameras', count: 'View All' },
@@ -11,6 +14,7 @@ const categories = [
 ];
 
 const CatalogPage = () => {
+  const t = useTranslations('catalog');
   return (
     <div className="bg-slate-50 min-h-screen">
       {/* Hero */}
@@ -21,15 +25,12 @@ const CatalogPage = () => {
         </div>
         <div className="container mx-auto px-4 lg:px-16 py-20 relative text-center">
           <p className="text-amber-400 text-sm font-semibold uppercase tracking-widest mb-3">
-            Catalog
+            {t('heroLabel')}
           </p>
           <h1 className="text-white text-4xl md:text-5xl font-bold mb-4">
-            Browse by <span className="text-amber-400">Category</span>
+            {t('heroTitle')} <span className="text-amber-400">{t('heroHighlight')}</span>
           </h1>
-          <p className="text-slate-400 text-lg max-w-xl mx-auto">
-            Explore our full range of premium electronics, organized by category to help you find
-            exactly what you need.
-          </p>
+          <p className="text-slate-400 text-lg max-w-xl mx-auto">{t('heroDesc')}</p>
         </div>
       </div>
 
@@ -52,15 +53,14 @@ const CatalogPage = () => {
             </svg>
           </div>
           <div>
-            <p className="text-amber-800 font-semibold text-sm">Full Catalog Coming Soon</p>
+            <p className="text-amber-800 font-semibold text-sm">{t('comingSoonTitle')}</p>
             <p className="text-amber-700 text-sm mt-0.5">
-              We&apos;re building a comprehensive catalog experience. In the meantime, browse all
-              products on our{' '}
+              {t('comingSoonDesc')}{' '}
               <Link
                 href="/products"
                 className="underline font-semibold hover:text-amber-900 transition-colors"
               >
-                Products page
+                {t('productsPage')}
               </Link>
               .
             </p>
@@ -78,7 +78,7 @@ const CatalogPage = () => {
                 </h3>
                 <p className="text-slate-500 text-sm mb-4">{cat.desc}</p>
                 <span className="inline-flex items-center gap-1.5 text-amber-500 text-sm font-semibold">
-                  {cat.count}
+                  {t('viewAll')}
                   <svg
                     className="w-4 h-4 group-hover:translate-x-1 transition-transform"
                     fill="none"
@@ -104,7 +104,7 @@ const CatalogPage = () => {
             href="/products"
             className="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-400 text-white font-semibold px-8 py-3.5 rounded-xl transition-colors shadow-md shadow-amber-500/30"
           >
-            View All Products
+            {t('viewAllProducts')}
             <svg
               className="w-4 h-4"
               fill="none"

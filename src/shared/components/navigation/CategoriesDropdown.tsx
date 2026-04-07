@@ -2,15 +2,16 @@
 
 import React from 'react';
 import { useQuery } from '@apollo/client';
-import { ChevronDownIcon } from '../icons';
 import { Dropdown } from '../elements/Dropdown';
 import { DropdownItem } from '../elements/types/dropdown.types';
 import { GET_CATEGORIES } from '@/entities/category/api/category.queries';
 import { GET_PRODUCTS } from '@/entities/product/api/product.queries';
 import { Category } from '@/entities/category/types/category.types';
 import { CategoriesDropdownProps } from './types/categories-dropdown.types';
+import { useTranslations } from 'next-intl';
 
 export const CategoriesDropdown: React.FC<CategoriesDropdownProps> = ({ className = '' }) => {
+  const t = useTranslations('navigation');
   const { data, loading, error } = useQuery<{ categories: Category[] }>(GET_CATEGORIES);
   const { data: productsData } = useQuery(GET_PRODUCTS, {
     variables: {
@@ -34,9 +35,9 @@ export const CategoriesDropdown: React.FC<CategoriesDropdownProps> = ({ classNam
   const categoryItems: DropdownItem[] = [
     {
       id: 'all',
-      label: 'All Categories',
+      label: t('allCategories'),
       href: '/products',
-      description: 'Browse all products',
+      description: t('browseAllProducts'),
       icon: (
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path
@@ -52,7 +53,7 @@ export const CategoriesDropdown: React.FC<CategoriesDropdownProps> = ({ classNam
       id: category.id,
       label: category.name,
       href: `/products?category=${category.id}`,
-      description: `${getCategoryCount(category.id)} products available`,
+      description: t('productsAvailable', { count: getCategoryCount(category.id) }),
       icon: (
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path
@@ -76,10 +77,15 @@ export const CategoriesDropdown: React.FC<CategoriesDropdownProps> = ({ classNam
           d="M4 6h16M4 12h16M4 18h16"
         />
       </svg>
-      Browse Categories
-      <span className="w-4 h-4 flex-shrink-0 transition-transform duration-200 group-hover:rotate-180 inline-block">
-        <ChevronDownIcon />
-      </span>
+      {t('browseCategories')}
+      <svg
+        className="w-5 h-5 flex-shrink-0 transition-transform duration-300 group-hover:rotate-180"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
+      </svg>
     </div>
   );
 
@@ -89,7 +95,7 @@ export const CategoriesDropdown: React.FC<CategoriesDropdownProps> = ({ classNam
         trigger={trigger}
         items={categoryItems}
         loading={loading}
-        emptyMessage={error ? 'Failed to load categories' : 'No categories available'}
+        emptyMessage={error ? t('failedLoadCategories') : t('noCategoriesAvailable')}
         dropdownClassName="border-0 shadow-2xl"
         maxHeight="max-h-96"
         placement="bottom-left"

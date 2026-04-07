@@ -1,9 +1,11 @@
 'use client';
 
 import { useState, useEffect, Suspense } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from '@/i18n/navigation';
+import { useSearchParams } from 'next/navigation';
 import { User, Mail, Shield, Package, Settings } from 'lucide-react';
 import { useAuth } from '@/shared/contexts/AuthContext';
+import { useTranslations } from 'next-intl';
 import { useMutation } from '@apollo/client';
 import { UPDATE_USER_MUTATION } from '@/shared/graphql/mutations/auth.mutations';
 import toast from 'react-hot-toast';
@@ -12,7 +14,8 @@ import OrdersTab from '@/features/profile/components/OrdersTab';
 function ProfileContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { isAuthenticated, user, login } = useAuth();
+  const { isAuthenticated, isHydrated, user, login } = useAuth();
+  const t = useTranslations('profile');
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -27,10 +30,10 @@ function ProfileContent() {
   }, [searchParams]);
 
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (isHydrated && !isAuthenticated) {
       router.push('/');
     }
-  }, [isAuthenticated, router]);
+  }, [isHydrated, isAuthenticated, router]);
 
   useEffect(() => {
     if (user) {
@@ -42,7 +45,7 @@ function ProfileContent() {
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50">
-        <div className="text-slate-500">Redirecting...</div>
+        <div className="text-slate-500">{t('redirecting')}</div>
       </div>
     );
   }
@@ -56,11 +59,11 @@ function ProfileContent() {
       });
       if (data?.updateUser) {
         login(data.updateUser.token, data.updateUser.user);
-        toast.success('Profile updated successfully!');
+        toast.success(t('profileUpdated'));
         setIsEditing(false);
       }
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Failed to update profile';
+      const message = error instanceof Error ? error.message : t('failedUpdateProfile');
       toast.error(message);
     }
   };
@@ -81,9 +84,9 @@ function ProfileContent() {
   };
 
   const tabs = [
-    { id: 'profile', label: 'Profile', icon: User },
-    { id: 'orders', label: 'Orders', icon: Package },
-    { id: 'settings', label: 'Settings', icon: Settings },
+    { id: 'profile', label: t('profileTab'), icon: User },
+    { id: 'orders', label: t('ordersTab'), icon: Package },
+    { id: 'settings', label: t('settingsTab'), icon: Settings },
   ];
 
   return (
@@ -97,7 +100,7 @@ function ProfileContent() {
               {getInitials(user?.name, user?.email)}
             </div>
             <div>
-              <h1 className="text-xl font-bold text-slate-900">{user?.name || 'My Account'}</h1>
+              <h1 className="text-xl font-bold text-slate-900">{user?.name || t('myAccount')}</h1>
               <p className="text-slate-400 text-sm">{user?.email}</p>
             </div>
           </div>
@@ -139,7 +142,7 @@ function ProfileContent() {
                   </div>
                   <div>
                     <h2 className="text-white text-2xl font-bold mb-1">
-                      {user?.name || 'User Profile'}
+                      {user?.name || t('userProfile')}
                     </h2>
                     <p className="text-slate-400 text-sm">{user?.email}</p>
                   </div>
@@ -149,13 +152,13 @@ function ProfileContent() {
               {/* Card body */}
               <div className="p-8">
                 <div className="flex justify-between items-center mb-6">
-                  <h3 className="text-lg font-bold text-slate-900">Account Information</h3>
+                  <h3 className="text-lg font-bold text-slate-900">{t('accountInformation')}</h3>
                   {!isEditing && (
                     <button
                       onClick={() => setIsEditing(true)}
                       className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white text-sm font-semibold rounded-xl transition-colors"
                     >
-                      Edit Profile
+                      {t('editProfile')}
                     </button>
                   )}
                 </div>
@@ -164,26 +167,26 @@ function ProfileContent() {
                   <form onSubmit={handleSubmit} className="space-y-5">
                     <div>
                       <label className="block text-sm font-semibold text-slate-700 mb-2">
-                        Full Name
+                        {t('fullName')}
                       </label>
                       <input
                         type="text"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                         className="w-full border border-slate-200 bg-slate-50 px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent text-slate-900 placeholder-slate-400"
-                        placeholder="Enter your name"
+                        placeholder={t('namePlaceholder')}
                       />
                     </div>
                     <div>
                       <label className="block text-sm font-semibold text-slate-700 mb-2">
-                        Email Address
+                        {t('emailAddress')}
                       </label>
                       <input
                         type="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         className="w-full border border-slate-200 bg-slate-50 px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent text-slate-900 placeholder-slate-400"
-                        placeholder="Enter your email"
+                        placeholder={t('emailPlaceholder')}
                       />
                     </div>
                     <div className="flex gap-3 pt-2">
@@ -192,7 +195,7 @@ function ProfileContent() {
                         disabled={updateLoading}
                         className="flex-1 bg-amber-500 hover:bg-amber-400 text-white font-semibold py-3 rounded-xl transition-colors shadow-lg shadow-amber-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        {updateLoading ? 'Saving...' : 'Save Changes'}
+                        {updateLoading ? t('saving') : t('saveChanges')}
                       </button>
                       <button
                         type="button"
@@ -203,7 +206,7 @@ function ProfileContent() {
                         }}
                         className="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-3 rounded-xl transition-colors"
                       >
-                        Cancel
+                        {t('cancel')}
                       </button>
                     </div>
                   </form>
@@ -212,10 +215,10 @@ function ProfileContent() {
                     {[
                       {
                         icon: User,
-                        label: 'Name',
-                        value: user?.name || 'Not provided',
+                        label: t('name'),
+                        value: user?.name || t('notProvided'),
                       },
-                      { icon: Mail, label: 'Email', value: user?.email },
+                      { icon: Mail, label: t('email'), value: user?.email },
                     ].map(({ icon: Icon, label, value }) => (
                       <div
                         key={label}
@@ -235,7 +238,7 @@ function ProfileContent() {
                         <Shield className="w-4 h-4 text-slate-400" />
                       </div>
                       <div>
-                        <div className="text-xs text-slate-400 font-medium mb-0.5">Role</div>
+                        <div className="text-xs text-slate-400 font-medium mb-0.5">{t('role')}</div>
                         <span
                           className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${
                             user?.role === 'admin'
@@ -243,7 +246,7 @@ function ProfileContent() {
                               : 'bg-blue-100 text-blue-700'
                           }`}
                         >
-                          {user?.role === 'admin' ? 'Administrator' : 'User'}
+                          {user?.role === 'admin' ? t('administrator') : t('user')}
                         </span>
                       </div>
                     </div>
@@ -261,31 +264,27 @@ function ProfileContent() {
         {activeTab === 'settings' && (
           <div className="max-w-2xl">
             <div className="bg-white rounded-2xl border border-slate-100 p-8">
-              <h2 className="text-lg font-bold text-slate-900 mb-6">Account Settings</h2>
+              <h2 className="text-lg font-bold text-slate-900 mb-6">{t('accountSettings')}</h2>
               <div className="space-y-3">
                 <button className="w-full text-left px-5 py-4 border border-slate-100 bg-slate-50 hover:bg-white hover:border-slate-200 hover:shadow-sm rounded-xl transition-all group">
                   <div className="font-semibold text-slate-800 group-hover:text-slate-900 text-sm">
-                    Change Password
+                    {t('changePassword')}
                   </div>
-                  <p className="text-slate-400 text-xs mt-0.5">
-                    Update your password to keep your account secure
-                  </p>
+                  <p className="text-slate-400 text-xs mt-0.5">{t('changePasswordDesc')}</p>
                 </button>
                 <button className="w-full text-left px-5 py-4 border border-slate-100 bg-slate-50 hover:bg-white hover:border-slate-200 hover:shadow-sm rounded-xl transition-all group">
                   <div className="font-semibold text-slate-800 group-hover:text-slate-900 text-sm">
-                    Notification Preferences
+                    {t('notificationPreferences')}
                   </div>
                   <p className="text-slate-400 text-xs mt-0.5">
-                    Manage how you receive notifications
+                    {t('notificationPreferencesDesc')}
                   </p>
                 </button>
                 <button className="w-full text-left px-5 py-4 border border-red-100 bg-red-50/50 hover:bg-red-50 hover:border-red-200 rounded-xl transition-all group">
                   <div className="font-semibold text-red-500 group-hover:text-red-600 text-sm">
-                    Delete Account
+                    {t('deleteAccount')}
                   </div>
-                  <p className="text-red-400 text-xs mt-0.5">
-                    Permanently delete your account and all data
-                  </p>
+                  <p className="text-red-400 text-xs mt-0.5">{t('deleteAccountDesc')}</p>
                 </button>
               </div>
             </div>

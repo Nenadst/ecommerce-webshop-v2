@@ -1,39 +1,9 @@
-import React from 'react';
-import Link from 'next/link';
-import { GoogleIcon, FacebookIcon, ChatIcon } from '../icons';
+'use client';
 
-const footerLinks = [
-  {
-    title: 'Products',
-    links: [
-      { label: 'Cameras', href: '/products' },
-      { label: 'Laptops', href: '/products' },
-      { label: 'Speakers', href: '/products' },
-      { label: 'Smart Phones', href: '/products' },
-      { label: 'Accessories', href: '/products' },
-    ],
-  },
-  {
-    title: 'Get Help',
-    links: [
-      { label: 'About Us', href: '/about-us' },
-      { label: 'Contact Us', href: '#' },
-      { label: 'Return Policy', href: '#' },
-      { label: 'Privacy Policy', href: '#' },
-      { label: 'Payment Policy', href: '#' },
-    ],
-  },
-  {
-    title: 'Company',
-    links: [
-      { label: 'News & Blog', href: '/blog' },
-      { label: 'Services', href: '#' },
-      { label: 'Our Policy', href: '#' },
-      { label: 'Customer Care', href: '#' },
-      { label: "FAQ's", href: '#' },
-    ],
-  },
-];
+import React from 'react';
+import { Link } from '@/i18n/navigation';
+import { GoogleIcon, FacebookIcon, ChatIcon } from '../icons';
+import { useTranslations } from 'next-intl';
 
 const socialLinks = [
   { icon: <GoogleIcon />, href: '#', label: 'Google' },
@@ -42,6 +12,42 @@ const socialLinks = [
 ];
 
 const FooterMenu = () => {
+  const t = useTranslations('footer');
+  const tNav = useTranslations('navigation');
+
+  const footerLinks = [
+    {
+      title: tNav('allProducts'),
+      links: [
+        { label: t('cameras'), href: '/products' },
+        { label: t('laptops'), href: '/products' },
+        { label: t('speakers'), href: '/products' },
+        { label: t('smartPhones'), href: '/products' },
+        { label: t('accessories'), href: '/products' },
+      ],
+    },
+    {
+      title: t('support'),
+      links: [
+        { label: tNav('aboutUs'), href: '/about-us' },
+        { label: t('contactUs'), href: '#' },
+        { label: t('returnPolicy'), href: '#' },
+        { label: t('privacyPolicy'), href: '#' },
+        { label: t('paymentPolicy'), href: '#' },
+      ],
+    },
+    {
+      title: t('company'),
+      links: [
+        { label: tNav('blog'), href: '/blog' },
+        { label: t('services'), href: '#' },
+        { label: t('ourPolicy'), href: '#' },
+        { label: t('customerCare'), href: '#' },
+        { label: t('faqs'), href: '#' },
+      ],
+    },
+  ];
+
   return (
     <div className="container mx-auto px-4 lg:px-16">
       {/* Main footer grid */}
@@ -68,10 +74,7 @@ const FooterMenu = () => {
               Web<span className="text-amber-500">Shop</span>
             </span>
           </Link>
-          <p className="text-slate-400 text-sm leading-relaxed">
-            Your one-stop destination for premium electronics. Quality products, competitive prices,
-            and exceptional service.
-          </p>
+          <p className="text-slate-400 text-sm leading-relaxed">{t('tagline')}</p>
           <div className="text-slate-500 text-sm leading-relaxed">
             <div className="flex items-start gap-2">
               <svg
@@ -107,7 +110,7 @@ const FooterMenu = () => {
                 key={s.label}
                 href={s.href}
                 aria-label={s.label}
-                className="w-9 h-9 bg-slate-800 hover:bg-amber-500 rounded-full flex items-center justify-center text-slate-400 hover:text-white transition-all duration-200 border border-slate-700 hover:border-amber-500"
+                className="w-9 h-9 bg-slate-800 hover:bg-amber-500 rounded-full flex items-center justify-center text-white hover:text-white transition-all duration-200 border border-slate-700 hover:border-amber-500"
               >
                 <span className="flex items-center justify-center">{s.icon}</span>
               </a>
@@ -140,19 +143,19 @@ const FooterMenu = () => {
       {/* Bottom bar */}
       <div className="border-t border-slate-800 py-6 flex flex-col sm:flex-row items-center justify-between gap-4">
         <p className="text-slate-500 text-sm">
-          © {new Date().getFullYear()} WebShop. All rights reserved.
+          {t('allRightsReserved', { year: new Date().getFullYear() })}
         </p>
         <div className="flex items-center gap-4 text-slate-600 text-xs">
           <Link href="#" className="hover:text-slate-400 transition-colors">
-            Privacy Policy
+            {t('privacyPolicy')}
           </Link>
           <span>·</span>
           <Link href="#" className="hover:text-slate-400 transition-colors">
-            Terms of Service
+            {t('termsOfService')}
           </Link>
           <span>·</span>
           <Link href="#" className="hover:text-slate-400 transition-colors">
-            Cookies
+            {t('cookies')}
           </Link>
         </div>
       </div>

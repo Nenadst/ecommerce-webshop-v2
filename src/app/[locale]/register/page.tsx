@@ -1,12 +1,14 @@
 'use client';
 
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from '@/i18n/navigation';
+import { useSearchParams } from 'next/navigation';
 import { useState, useEffect, Suspense } from 'react';
-import Link from 'next/link';
+import { Link } from '@/i18n/navigation';
 import Image from 'next/image';
 import { ArrowLeft } from 'lucide-react';
 import { useAuth } from '@/shared/contexts/AuthContext';
 import { useAuthMutations } from '@/shared/hooks/useAuthMutations';
+import { useTranslations } from 'next-intl';
 
 function RegisterForm() {
   const router = useRouter();
@@ -14,6 +16,7 @@ function RegisterForm() {
   const returnUrl = searchParams.get('returnUrl') || '/';
   const { isAuthenticated } = useAuth();
   const { register, error, setError, isLoading } = useAuthMutations();
+  const t = useTranslations('auth');
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -33,15 +36,15 @@ function RegisterForm() {
     setError('');
 
     if (!name || !email || !password || !confirm) {
-      setError('Please fill in all required fields');
+      setError(t('fillAllRequired'));
       return;
     }
     if (password !== confirm) {
-      setError('Passwords do not match');
+      setError(t('passwordsNoMatch'));
       return;
     }
     if (password.length < 6) {
-      setError('Password must be at least 6 characters long');
+      setError(t('passwordMinLength'));
       return;
     }
     await register({ email, password, name });
@@ -49,10 +52,13 @@ function RegisterForm() {
 
   const passwordStrength = () => {
     if (password.length === 0) return null;
-    if (password.length < 6) return { label: 'Too short', color: 'bg-red-400', width: 'w-1/4' };
-    if (password.length < 8) return { label: 'Weak', color: 'bg-amber-400', width: 'w-2/4' };
-    if (password.length < 12) return { label: 'Good', color: 'bg-blue-400', width: 'w-3/4' };
-    return { label: 'Strong', color: 'bg-green-400', width: 'w-full' };
+    if (password.length < 6)
+      return { label: t('passwordTooShort'), color: 'bg-red-400', width: 'w-1/4' };
+    if (password.length < 8)
+      return { label: t('passwordWeak'), color: 'bg-amber-400', width: 'w-2/4' };
+    if (password.length < 12)
+      return { label: t('passwordGood'), color: 'bg-blue-400', width: 'w-3/4' };
+    return { label: t('passwordStrong'), color: 'bg-green-400', width: 'w-full' };
   };
 
   const strength = passwordStrength();
@@ -152,13 +158,13 @@ function RegisterForm() {
             className="inline-flex items-center gap-2 text-slate-400 hover:text-slate-700 transition-colors text-sm mb-8 group"
           >
             <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-0.5" />
-            Back
+            {t('back')}
           </Link>
 
           {/* Header */}
           <div className="mb-7">
-            <h1 className="text-3xl font-bold text-slate-900 mb-2">Create an account</h1>
-            <p className="text-slate-500">Join thousands of happy customers today</p>
+            <h1 className="text-3xl font-bold text-slate-900 mb-2">{t('createAccountTitle')}</h1>
+            <p className="text-slate-500">{t('joinThousands')}</p>
           </div>
 
           {/* Error */}
@@ -185,7 +191,9 @@ function RegisterForm() {
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Name */}
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-2">Full name</label>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">
+                {t('fullName')}
+              </label>
               <div className="relative">
                 <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -199,7 +207,7 @@ function RegisterForm() {
                 </div>
                 <input
                   type="text"
-                  placeholder="John Doe"
+                  placeholder={t('namePlaceholder')}
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   autoFocus
@@ -212,7 +220,7 @@ function RegisterForm() {
             {/* Email */}
             <div>
               <label className="block text-sm font-semibold text-slate-700 mb-2">
-                Email address
+                {t('emailAddress')}
               </label>
               <div className="relative">
                 <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
@@ -227,7 +235,7 @@ function RegisterForm() {
                 </div>
                 <input
                   type="email"
-                  placeholder="you@example.com"
+                  placeholder={t('emailPlaceholder')}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -238,7 +246,9 @@ function RegisterForm() {
 
             {/* Password */}
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-2">Password</label>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">
+                {t('password')}
+              </label>
               <div className="relative">
                 <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -252,7 +262,7 @@ function RegisterForm() {
                 </div>
                 <input
                   type={showPassword ? 'text' : 'password'}
-                  placeholder="Min. 6 characters"
+                  placeholder={t('minChars')}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
@@ -309,7 +319,7 @@ function RegisterForm() {
             {/* Confirm password */}
             <div>
               <label className="block text-sm font-semibold text-slate-700 mb-2">
-                Confirm password
+                {t('confirmPassword')}
               </label>
               <div className="relative">
                 <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
@@ -324,7 +334,7 @@ function RegisterForm() {
                 </div>
                 <input
                   type={showConfirm ? 'text' : 'password'}
-                  placeholder="Re-enter your password"
+                  placeholder={t('reEnterPassword')}
                   value={confirm}
                   onChange={(e) => setConfirm(e.target.value)}
                   required
@@ -376,7 +386,7 @@ function RegisterForm() {
                       clipRule="evenodd"
                     />
                   </svg>
-                  Passwords do not match
+                  {t('passwordsNoMatch')}
                 </p>
               )}
             </div>
@@ -404,10 +414,10 @@ function RegisterForm() {
                       d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
                     />
                   </svg>
-                  Creating account...
+                  {t('creatingAccount')}
                 </span>
               ) : (
-                'Create Account'
+                t('createAccountBtn')
               )}
             </button>
           </form>
@@ -415,14 +425,14 @@ function RegisterForm() {
           {/* Divider */}
           <div className="flex items-center gap-4 my-6">
             <div className="flex-1 h-px bg-slate-100" />
-            <span className="text-slate-400 text-xs font-medium">Already have an account?</span>
+            <span className="text-slate-400 text-xs font-medium">{t('alreadyHaveAccount')}</span>
             <div className="flex-1 h-px bg-slate-100" />
           </div>
 
           {/* Login CTA */}
           <Link href={`/login?returnUrl=${encodeURIComponent(returnUrl)}`}>
             <button className="w-full py-4 border-2 border-slate-200 hover:border-amber-400 text-slate-700 hover:text-amber-500 font-semibold rounded-xl transition-all text-sm">
-              Sign in instead
+              {t('signInInstead')}
             </button>
           </Link>
         </div>

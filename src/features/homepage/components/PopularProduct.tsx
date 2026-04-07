@@ -1,10 +1,12 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useTranslations } from 'next-intl';
 
 const filters = ['All', 'Cameras', 'Laptops', 'Tablets', 'Speakers'];
 
 const PopularProduct = () => {
+  const t = useTranslations('homepage');
   const [active, setActive] = useState('All');
 
   return (
@@ -12,9 +14,9 @@ const PopularProduct = () => {
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5">
         <div>
           <p className="text-amber-500 text-sm font-semibold uppercase tracking-widest mb-1">
-            Our Collection
+            {t('ourCollection')}
           </p>
-          <h2 className="text-slate-900 text-2xl md:text-3xl font-bold">Popular Products</h2>
+          <h2 className="text-slate-900 text-2xl md:text-3xl font-bold">{t('popularProducts')}</h2>
         </div>
         <div className="flex flex-wrap gap-2">
           {filters.map((filter) => (

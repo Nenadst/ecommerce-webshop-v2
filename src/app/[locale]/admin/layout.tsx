@@ -1,8 +1,8 @@
 'use client';
 
 import { ArrowLeft, LogOut } from 'lucide-react';
-import Link from 'next/link';
-import { useRouter, usePathname } from 'next/navigation';
+import { Link } from '@/i18n/navigation';
+import { useRouter, usePathname, useParams } from 'next/navigation';
 import { useAuth } from '@/shared/contexts/AuthContext';
 import { useEffect, useRef } from 'react';
 
@@ -10,7 +10,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const { isAuthenticated, isAdmin } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
+  const params = useParams();
+  const locale = (params?.locale as string) || 'en';
   const isLoggingOut = useRef(false);
+
+  // Strip the locale prefix from pathname for active link matching
+  const localePath = pathname.replace(`/${locale}`, '') || '/';
 
   useEffect(() => {
     if (!isAuthenticated && !isLoggingOut.current) {
@@ -53,7 +58,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <Link
             href="/admin"
             className={`block px-4 py-2 rounded-lg transition-colors ${
-              pathname === '/admin' ? 'bg-sky-700 font-semibold' : 'hover:bg-sky-800'
+              localePath === '/admin' ? 'bg-sky-700 font-semibold' : 'hover:bg-sky-800'
             }`}
           >
             Dashboard
@@ -61,7 +66,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <Link
             href="/admin/orders"
             className={`block px-4 py-2 rounded-lg transition-colors ${
-              pathname.startsWith('/admin/orders') ? 'bg-sky-700 font-semibold' : 'hover:bg-sky-800'
+              localePath.startsWith('/admin/orders')
+                ? 'bg-sky-700 font-semibold'
+                : 'hover:bg-sky-800'
             }`}
           >
             Orders
@@ -69,7 +76,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <Link
             href="/admin/users"
             className={`block px-4 py-2 rounded-lg transition-colors ${
-              pathname.startsWith('/admin/users') ? 'bg-sky-700 font-semibold' : 'hover:bg-sky-800'
+              localePath.startsWith('/admin/users')
+                ? 'bg-sky-700 font-semibold'
+                : 'hover:bg-sky-800'
             }`}
           >
             Users
@@ -77,7 +86,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <Link
             href="/admin/products"
             className={`block px-4 py-2 rounded-lg transition-colors ${
-              pathname.startsWith('/admin/products')
+              localePath.startsWith('/admin/products')
                 ? 'bg-sky-700 font-semibold'
                 : 'hover:bg-sky-800'
             }`}
@@ -87,7 +96,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <Link
             href="/admin/categories"
             className={`block px-4 py-2 rounded-lg transition-colors ${
-              pathname.startsWith('/admin/categories')
+              localePath.startsWith('/admin/categories')
                 ? 'bg-sky-700 font-semibold'
                 : 'hover:bg-sky-800'
             }`}

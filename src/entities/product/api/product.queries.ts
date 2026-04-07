@@ -16,6 +16,11 @@ export const GET_PRODUCTS = gql`
           id
           name
         }
+        translations {
+          locale
+          name
+          description
+        }
       }
       total
       page
@@ -45,6 +50,11 @@ export const GET_PRODUCT = gql`
         id
         name
       }
+      translations {
+        locale
+        name
+        description
+      }
     }
   }
 `;
@@ -64,6 +74,11 @@ export const UPDATE_PRODUCT = gql`
         id
         name
       }
+      translations {
+        locale
+        name
+        description
+      }
     }
   }
 `;
@@ -82,6 +97,11 @@ export const CREATE_PRODUCT = gql`
       category {
         id
         name
+      }
+      translations {
+        locale
+        name
+        description
       }
     }
   }

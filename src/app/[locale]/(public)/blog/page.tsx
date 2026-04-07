@@ -1,5 +1,8 @@
+'use client';
+
 import React from 'react';
-import Link from 'next/link';
+import { Link } from '@/i18n/navigation';
+import { useTranslations } from 'next-intl';
 
 const placeholderPosts = [
   {
@@ -68,6 +71,7 @@ const categoryColors: Record<string, string> = {
 };
 
 const BlogPage = () => {
+  const t = useTranslations('blog');
   return (
     <div className="bg-slate-50 min-h-screen">
       {/* Hero */}
@@ -78,18 +82,15 @@ const BlogPage = () => {
         </div>
         <div className="container mx-auto px-4 lg:px-16 py-20 relative text-center">
           <p className="text-amber-400 text-sm font-semibold uppercase tracking-widest mb-3">
-            Our Blog
+            {t('heroBlogLabel')}
           </p>
           <h1 className="text-white text-4xl md:text-5xl font-bold mb-4">
-            News, Tips &amp; <span className="text-amber-400">Insights</span>
+            {t('heroTitle')} <span className="text-amber-400">{t('heroHighlight')}</span>
           </h1>
-          <p className="text-slate-400 text-lg max-w-xl mx-auto">
-            Stay up to date with the latest in tech — buying guides, product reviews, and expert
-            tips from our team.
-          </p>
+          <p className="text-slate-400 text-lg max-w-xl mx-auto">{t('heroDesc')}</p>
           <div className="mt-6 inline-flex items-center gap-2 bg-amber-500/15 border border-amber-500/25 text-amber-400 text-sm font-medium px-4 py-2 rounded-full">
             <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
-            Articles coming soon — stay tuned!
+            {t('articlesComingSoon')}
           </div>
         </div>
       </div>
@@ -138,7 +139,7 @@ const BlogPage = () => {
                 <div className="flex items-center justify-between">
                   <span className="text-xs text-slate-400">{post.date}</span>
                   <span className="text-xs font-semibold text-amber-500 bg-amber-50 border border-amber-100 px-2.5 py-1 rounded-full">
-                    Coming Soon
+                    {t('comingSoon')}
                   </span>
                 </div>
               </div>
@@ -153,17 +154,15 @@ const BlogPage = () => {
           </div>
           <div className="relative">
             <p className="text-amber-400 text-sm font-semibold uppercase tracking-widest mb-2">
-              Stay Notified
+              {t('stayNotified')}
             </p>
-            <h2 className="text-white text-2xl md:text-3xl font-bold mb-3">Be the First to Read</h2>
-            <p className="text-slate-400 mb-6 max-w-md mx-auto">
-              Subscribe to our newsletter and get notified when new articles are published.
-            </p>
+            <h2 className="text-white text-2xl md:text-3xl font-bold mb-3">{t('beFirstToRead')}</h2>
+            <p className="text-slate-400 mb-6 max-w-md mx-auto">{t('subscribeDesc')}</p>
             <Link
               href="/"
               className="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-400 text-white font-semibold px-6 py-3 rounded-xl transition-colors shadow-md shadow-amber-500/30"
             >
-              Go to Homepage
+              {t('goToHomepage')}
               <svg
                 className="w-4 h-4"
                 fill="none"

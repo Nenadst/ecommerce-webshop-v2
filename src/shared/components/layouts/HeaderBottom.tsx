@@ -2,7 +2,7 @@ import React from 'react';
 import SearchSection from './SearchSection';
 import CartSection from '@/shared/components/layouts/CartSection';
 import Navigation from '@/shared/components/layouts/Navigation';
-import Link from 'next/link';
+import { Link } from '@/i18n/navigation';
 
 const HeaderBottom = () => {
   return (

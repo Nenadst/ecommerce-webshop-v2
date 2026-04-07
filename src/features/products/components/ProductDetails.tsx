@@ -10,13 +10,15 @@ import { useCartDrawer } from '@/shared/contexts/CartDrawerContext';
 import { useAuth } from '@/shared/contexts/AuthContext';
 import { useActivityTracker } from '@/shared/hooks/useActivityTracker';
 import toast from 'react-hot-toast';
-import Link from 'next/link';
+import { Link } from '@/i18n/navigation';
 import { AuthModal } from '@/shared/components/modals/AuthModal';
 import { useParams } from 'next/navigation';
 import { useQuery } from '@apollo/client';
 import { GET_PRODUCT } from '@/entities/product/api/product.queries';
+import { useTranslations } from 'next-intl';
 
 const ProductDetails = () => {
+  const t = useTranslations('productDetail');
   const params = useParams();
   const productId = params.id as string;
 
@@ -82,7 +84,7 @@ const ProductDetails = () => {
         <div className="container mx-auto px-4 lg:px-16 py-16 flex items-center justify-center">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-2 border-slate-200 border-t-amber-500 mx-auto mb-4" />
-            <p className="text-slate-500">Loading product...</p>
+            <p className="text-slate-500">{t('loading')}</p>
           </div>
         </div>
       </div>
@@ -94,12 +96,12 @@ const ProductDetails = () => {
       <div className="bg-slate-50 min-h-screen">
         <div className="container mx-auto px-4 lg:px-16 py-16 flex items-center justify-center">
           <div className="text-center">
-            <p className="text-slate-500 text-lg">Product not found</p>
+            <p className="text-slate-500 text-lg">{t('notFound')}</p>
             <Link
               href="/products"
               className="text-amber-500 hover:text-amber-600 mt-2 inline-block text-sm font-medium"
             >
-              ← Back to products
+              {t('backToProducts')}
             </Link>
           </div>
         </div>
@@ -116,11 +118,11 @@ const ProductDetails = () => {
 
   const handleAddToCart = async () => {
     if (availableQuantity === 0) {
-      toast.error('All available stock is already in your cart');
+      toast.error(t('allStockInCart'));
       return;
     }
     if (selectedQuantity > availableQuantity) {
-      toast.error(`Only ${availableQuantity} more item(s) can be added to cart`);
+      toast.error(t('maxStock', { count: availableQuantity }));
       return;
     }
     setAddingToCart(true);
@@ -128,7 +130,7 @@ const ProductDetails = () => {
       await addToCart(product.id, selectedQuantity);
       setSelectedQuantity(1);
       openDrawer();
-      toast.success('Product added to cart!');
+      toast.success(t('addToCartSuccess'));
     } catch (error) {
       console.error('Failed to add to cart:', error);
     } finally {
@@ -179,7 +181,7 @@ const ProductDetails = () => {
                     priority
                   />
                   <div className="absolute bottom-3 right-3 bg-black/50 text-white text-xs px-2 py-1 rounded-lg">
-                    🔍 Click to zoom
+                    🔍 {t('clickToZoom')}
                   </div>
                 </div>
 
@@ -225,7 +227,7 @@ const ProductDetails = () => {
                   )}
                   {availableQuantity > 0 && availableQuantity <= 10 && (
                     <span className="text-xs font-semibold text-orange-600 bg-orange-50 border border-orange-200 px-3 py-1 rounded-full">
-                      Only {availableQuantity} left!
+                      {t('onlyLeft', { count: availableQuantity })}
                     </span>
                   )}
                 </div>
@@ -238,7 +240,7 @@ const ProductDetails = () => {
                 {/* Rating */}
                 <div className="flex items-center gap-2">
                   <Star count={5} />
-                  <span className="text-slate-400 text-sm">No reviews yet</span>
+                  <span className="text-slate-400 text-sm">{t('noReviews')}</span>
                 </div>
 
                 {/* Price */}
@@ -255,26 +257,26 @@ const ProductDetails = () => {
 
                 {/* Availability */}
                 <div className="flex items-center gap-3 py-3 border-y border-slate-100">
-                  <span className="text-slate-600 text-sm font-medium">Availability:</span>
+                  <span className="text-slate-600 text-sm font-medium">{t('availability')}:</span>
                   {availableQuantity > 0 ? (
                     <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-green-600">
                       <span className="w-2 h-2 rounded-full bg-green-500" />
-                      {availableQuantity} in stock
+                      {t('inStock', { count: availableQuantity })}
                       {quantityInCart > 0 && (
                         <span className="text-slate-400 font-normal">
-                          ({quantityInCart} in cart)
+                          ({t('inCart', { count: quantityInCart })})
                         </span>
                       )}
                     </span>
                   ) : product.quantity > 0 ? (
                     <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-orange-600">
                       <span className="w-2 h-2 rounded-full bg-orange-500" />
-                      All in cart
+                      {t('allInCart')}
                     </span>
                   ) : (
                     <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-red-500">
                       <span className="w-2 h-2 rounded-full bg-red-500" />
-                      Out of stock
+                      {t('outOfStock')}
                     </span>
                   )}
                 </div>
@@ -344,12 +346,12 @@ const ProductDetails = () => {
                     } disabled:opacity-60`}
                   >
                     {addingToCart
-                      ? 'Adding...'
+                      ? t('adding')
                       : availableQuantity > 0
-                        ? 'Add to Cart'
+                        ? t('addToCart')
                         : product.quantity > 0
-                          ? 'All in Cart'
-                          : 'Out of Stock'}
+                          ? t('allInCartBtn')
+                          : t('outOfStock')}
                   </button>
 
                   {/* Wishlist */}
@@ -371,7 +373,7 @@ const ProductDetails = () => {
                 <div className="grid grid-cols-2 gap-3 pt-2">
                   <div className="bg-slate-50 rounded-xl px-4 py-3">
                     <span className="text-xs text-slate-400 uppercase tracking-wide font-medium">
-                      SKU
+                      {t('sku')}
                     </span>
                     <p className="text-slate-700 font-semibold text-sm mt-0.5">
                       {product.id.slice(0, 8).toUpperCase()}
@@ -379,7 +381,7 @@ const ProductDetails = () => {
                   </div>
                   <div className="bg-slate-50 rounded-xl px-4 py-3">
                     <span className="text-xs text-slate-400 uppercase tracking-wide font-medium">
-                      Category
+                      {t('category')}
                     </span>
                     <p className="mt-0.5">
                       <Link
@@ -408,7 +410,7 @@ const ProductDetails = () => {
                       : 'text-slate-500 border-transparent hover:text-slate-900'
                   }`}
                 >
-                  {tab}
+                  {tab === 'description' ? t('description') : t('reviews')}
                 </button>
               ))}
             </div>
@@ -418,7 +420,7 @@ const ProductDetails = () => {
                 product.description ? (
                   <p className="text-slate-600 leading-relaxed">{product.description}</p>
                 ) : (
-                  <p className="text-slate-400">No description available for this product.</p>
+                  <p className="text-slate-400">{t('noDescriptionAvailable')}</p>
                 )
               ) : (
                 <div className="flex flex-col items-center gap-4 py-8 text-center">
@@ -438,13 +440,11 @@ const ProductDetails = () => {
                     </svg>
                   </div>
                   <div>
-                    <p className="text-slate-700 font-semibold">No reviews yet</p>
-                    <p className="text-slate-400 text-sm mt-1">
-                      Be the first to share your experience
-                    </p>
+                    <p className="text-slate-700 font-semibold">{t('noReviews')}</p>
+                    <p className="text-slate-400 text-sm mt-1">{t('beFirstReview')}</p>
                   </div>
                   <button className="px-6 py-2.5 bg-amber-500 hover:bg-amber-400 text-white text-sm font-semibold rounded-xl transition-colors shadow-sm shadow-amber-500/30">
-                    Write a Review
+                    {t('writeReview')}
                   </button>
                 </div>
               )}

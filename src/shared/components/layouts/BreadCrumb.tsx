@@ -1,12 +1,13 @@
 'use client';
 
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { Link } from '@/i18n/navigation';
+import { usePathname } from '@/i18n/navigation';
 import React from 'react';
 import { ChevronRightIcon } from '../icons';
 import { useQuery } from '@apollo/client';
 import { GET_PRODUCT } from '@/entities/product/api/product.queries';
 import { Product } from '@/entities/product/types/product.types';
+import { useTranslations } from 'next-intl';
 
 interface BreadcrumbItem {
   label: string;
@@ -15,6 +16,7 @@ interface BreadcrumbItem {
 
 export const BreadCrumb = () => {
   const pathname = usePathname();
+  const t = useTranslations('navigation');
 
   const paths = pathname.split('/').filter((path) => path);
   const isProductDetail = paths[0] === 'products' && paths[1] && paths[1].length > 10;
@@ -26,7 +28,7 @@ export const BreadCrumb = () => {
   });
 
   const generateBreadcrumbs = (): BreadcrumbItem[] => {
-    const breadcrumbs: BreadcrumbItem[] = [{ label: 'Home', href: '/' }];
+    const breadcrumbs: BreadcrumbItem[] = [{ label: t('home'), href: '/' }];
 
     let currentPath = '';
     paths.forEach((path, index) => {
@@ -40,15 +42,15 @@ export const BreadCrumb = () => {
       if (path === 'admin') {
         label = 'Admin';
       } else if (path === 'products' && index === 0) {
-        label = 'Products';
+        label = t('productsPage');
       } else if (path === 'wishlist') {
-        label = 'Wishlist';
+        label = t('wishlistPage');
       } else if (path === 'cart') {
-        label = 'Shopping Cart';
+        label = t('cartPage');
       } else if (path === 'checkout') {
-        label = 'Checkout';
+        label = t('checkoutPage');
       } else if (path === 'profile') {
-        label = 'My Profile';
+        label = t('profilePage');
       } else if (isProductDetail && index === 1 && productData?.product) {
         label = productData.product.name;
       }

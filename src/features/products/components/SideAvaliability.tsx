@@ -3,6 +3,7 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
 import { GET_PRODUCTS } from '@/entities/product/api/product.queries';
+import { useTranslations } from 'next-intl';
 
 interface SideAvailabilityProps {
   inStockSelected: boolean;
@@ -17,6 +18,7 @@ const SideAvaliability = ({
   onAvailabilityChange,
   selectedCategories,
 }: SideAvailabilityProps) => {
+  const t = useTranslations('products');
   const { data } = useQuery(GET_PRODUCTS, {
     variables: {
       page: 1,
@@ -33,7 +35,7 @@ const SideAvaliability = ({
   const options = [
     {
       id: 'ins',
-      label: 'In Stock',
+      label: t('inStock'),
       count: inStockCount,
       checked: inStockSelected,
       disabled: inStockCount === 0,
@@ -42,7 +44,7 @@ const SideAvaliability = ({
     },
     {
       id: 'oos',
-      label: 'Out of Stock',
+      label: t('outOfStock'),
       count: outOfStockCount,
       checked: outOfStockSelected,
       disabled: outOfStockCount === 0,
@@ -54,12 +56,14 @@ const SideAvaliability = ({
   return (
     <div className="bg-white rounded-2xl border border-slate-100 p-5 mt-4">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-slate-900 font-bold text-sm uppercase tracking-wider">Availability</h3>
+        <h3 className="text-slate-900 font-bold text-sm uppercase tracking-wider">
+          {t('availability')}
+        </h3>
         <button
           onClick={() => onAvailabilityChange(true, true)}
           className="text-amber-500 text-xs font-medium hover:text-amber-600 transition-colors"
         >
-          Reset
+          {t('resetFilter')}
         </button>
       </div>
 

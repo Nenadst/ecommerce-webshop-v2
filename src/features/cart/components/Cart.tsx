@@ -2,12 +2,14 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
+import { Link } from '@/i18n/navigation';
 import { useCart } from '@/shared/contexts/CartContext';
 import Spinner from '@/shared/components/spinner/Spinner';
 import ConfirmModal from '@/shared/components/modals/ConfirmModal';
+import { useTranslations } from 'next-intl';
 
 const Cart = () => {
+  const t = useTranslations('cart');
   const {
     cartItems,
     total,
@@ -75,7 +77,7 @@ const Cart = () => {
       <div className="bg-slate-50 min-h-screen">
         <div className="bg-white border-b border-slate-100">
           <div className="container mx-auto px-4 lg:px-16 py-8">
-            <h1 className="text-3xl font-bold text-slate-900">Shopping Cart</h1>
+            <h1 className="text-3xl font-bold text-slate-900">{t('title')}</h1>
           </div>
         </div>
         <div className="flex justify-center py-24">
@@ -92,16 +94,18 @@ const Cart = () => {
         <div className="container mx-auto px-4 lg:px-16 py-8">
           <div className="flex items-center gap-2 text-slate-400 text-sm mb-3">
             <Link href="/" className="hover:text-amber-500 transition-colors">
-              Home
+              {t('home')}
             </Link>
             <span>›</span>
-            <span className="text-slate-700 font-medium">Shopping Cart</span>
+            <span className="text-slate-700 font-medium">{t('title')}</span>
           </div>
           <div className="flex items-center justify-between">
-            <h1 className="text-3xl font-bold text-slate-900">Shopping Cart</h1>
+            <h1 className="text-3xl font-bold text-slate-900">{t('title')}</h1>
             {cartItems.length > 0 && (
               <span className="text-slate-500 text-sm">
-                {itemCount} {itemCount === 1 ? 'item' : 'items'}
+                {itemCount === 1
+                  ? t('item', { count: itemCount })
+                  : t('items', { count: itemCount })}
               </span>
             )}
           </div>
@@ -127,13 +131,11 @@ const Cart = () => {
                 />
               </svg>
             </div>
-            <h2 className="text-2xl font-bold text-slate-900 mb-2">Your cart is empty</h2>
-            <p className="text-slate-500 mb-8">
-              Looks like you haven&apos;t added anything yet. Start exploring our products!
-            </p>
+            <h2 className="text-2xl font-bold text-slate-900 mb-2">{t('empty')}</h2>
+            <p className="text-slate-500 mb-8">{t('emptyCartMessage')}</p>
             <Link href="/products">
               <button className="px-8 py-3 bg-amber-500 hover:bg-amber-400 text-white font-semibold rounded-2xl transition-colors shadow-lg shadow-amber-500/30">
-                Start Shopping
+                {t('startShopping')}
               </button>
             </Link>
           </div>
@@ -143,13 +145,15 @@ const Cart = () => {
             <div className="lg:col-span-2 space-y-4">
               {/* Header row */}
               <div className="flex justify-between items-center">
-                <h2 className="text-lg font-bold text-slate-900">Cart Items ({itemCount})</h2>
+                <h2 className="text-lg font-bold text-slate-900">
+                  {t('cartItems', { count: itemCount })}
+                </h2>
                 <button
                   onClick={handleClearCartClick}
                   disabled={isClearing}
                   className="text-sm text-slate-400 hover:text-red-500 transition-colors font-medium disabled:opacity-50"
                 >
-                  {isClearing ? 'Clearing...' : 'Clear all'}
+                  {isClearing ? t('clearing') : t('clearAll')}
                 </button>
               </div>
 
@@ -220,7 +224,7 @@ const Cart = () => {
 
                       {product?.quantity !== undefined && product.quantity < 10 && (
                         <p className="text-amber-500 text-xs font-medium mb-2">
-                          Only {product.quantity} left in stock
+                          {t('onlyLeft', { count: product.quantity })}
                         </p>
                       )}
 
@@ -278,7 +282,7 @@ const Cart = () => {
                         {/* Price */}
                         <div className="text-right">
                           <div className="text-slate-400 text-xs mb-0.5">
-                            €{product?.price?.toFixed(2)} each
+                            €{product?.price?.toFixed(2)} {t('each')}
                           </div>
                           <div className="text-slate-900 text-lg font-bold">
                             €{((product?.price || 0) * item.quantity).toFixed(2)}
@@ -292,7 +296,7 @@ const Cart = () => {
 
               <Link href="/products">
                 <button className="w-full mt-2 py-3 bg-white border border-slate-200 hover:border-amber-300 text-slate-600 hover:text-amber-500 rounded-2xl font-medium transition-all text-sm">
-                  ← Continue Shopping
+                  {t('continueShopping')}
                 </button>
               </Link>
             </div>
@@ -300,29 +304,31 @@ const Cart = () => {
             {/* Order summary */}
             <div className="lg:col-span-1">
               <div className="bg-white rounded-2xl border border-slate-100 p-6 sticky top-24">
-                <h2 className="text-lg font-bold text-slate-900 mb-5">Order Summary</h2>
+                <h2 className="text-lg font-bold text-slate-900 mb-5">{t('orderSummary')}</h2>
 
                 <div className="space-y-3 mb-5">
                   <div className="flex justify-between text-slate-600 text-sm">
                     <span>
-                      Subtotal ({itemCount} {itemCount === 1 ? 'item' : 'items'})
+                      {itemCount === 1
+                        ? t('item', { count: itemCount })
+                        : t('items', { count: itemCount })}
                     </span>
                     <span className="font-medium text-slate-900">€{total.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between text-slate-600 text-sm">
-                    <span>Shipping</span>
-                    <span className="font-semibold text-green-500">FREE</span>
+                    <span>{t('shipping')}</span>
+                    <span className="font-semibold text-green-500">{t('freeShipping')}</span>
                   </div>
                   <div className="h-px bg-slate-100 my-1" />
                   <div className="flex justify-between text-slate-900 font-bold text-lg">
-                    <span>Total</span>
+                    <span>{t('total')}</span>
                     <span>€{total.toFixed(2)}</span>
                   </div>
                 </div>
 
                 <Link href="/checkout">
                   <button className="w-full py-4 bg-amber-500 hover:bg-amber-400 text-white font-bold rounded-2xl transition-colors shadow-lg shadow-amber-500/30 mb-4">
-                    Proceed to Checkout →
+                    {t('proceedToCheckout')}
                   </button>
                 </Link>
 
@@ -345,8 +351,10 @@ const Cart = () => {
                       </svg>
                     </div>
                     <div>
-                      <div className="text-slate-800 text-xs font-semibold">Secure Checkout</div>
-                      <div className="text-slate-400 text-xs">256-bit SSL encryption</div>
+                      <div className="text-slate-800 text-xs font-semibold">
+                        {t('secureCheckout')}
+                      </div>
+                      <div className="text-slate-400 text-xs">{t('sslEncryption')}</div>
                     </div>
                   </div>
                   <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
@@ -366,8 +374,10 @@ const Cart = () => {
                       </svg>
                     </div>
                     <div>
-                      <div className="text-slate-800 text-xs font-semibold">Free Shipping</div>
-                      <div className="text-slate-400 text-xs">No minimum order required</div>
+                      <div className="text-slate-800 text-xs font-semibold">
+                        {t('freeShippingBadge')}
+                      </div>
+                      <div className="text-slate-400 text-xs">{t('noMinimum')}</div>
                     </div>
                   </div>
                 </div>
@@ -381,10 +391,10 @@ const Cart = () => {
         isOpen={showClearModal}
         onClose={() => setShowClearModal(false)}
         onConfirm={handleConfirmClearCart}
-        title="Clear Cart"
-        message="Are you sure you want to clear your entire cart? This action cannot be undone."
-        confirmText="Clear Cart"
-        cancelText="Cancel"
+        title={t('clearCart')}
+        message={t('clearCartConfirm')}
+        confirmText={t('clearCart')}
+        cancelText={t('cancel')}
         isLoading={isClearing}
       />
     </div>
